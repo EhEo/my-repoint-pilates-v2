@@ -1,4 +1,6 @@
-FROM node:22-alpine
+FROM node:22-slim
+
+RUN apt-get update && apt-get install -y openssl
 
 WORKDIR /app
 
@@ -12,4 +14,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run build && npm start"]
+CMD ["sh", "-c", "npx prisma generate && npx prisma db push && npm run build && npm start"]
