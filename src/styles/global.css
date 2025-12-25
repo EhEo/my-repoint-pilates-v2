@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import './variables.css';
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: var(--font-sans);
+    background-color: hsl(var(--color-bg-main));
+    color: hsl(var(--color-text-main));
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+#root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Typography Utilities */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.2;
+    font-weight: 600;
+    color: hsl(var(--color-text-main));
+    margin-bottom: var(--space-4);
+}
+
+h1 {
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    font-size: 2rem;
+    letter-spacing: -0.01em;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: var(--space-4);
+}
+
+/* Utility Classes */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+.card {
+    background-color: hsl(var(--color-bg-card));
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-6);
+    border: 1px solid hsl(var(--color-border));
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-base);
+    border: none;
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background-color: hsl(var(--color-primary));
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: hsl(var(--color-primary-light));
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid hsl(var(--color-border));
+    color: hsl(var(--color-text-main));
+}
+
+.btn-secondary:hover {
+    background-color: hsl(var(--color-bg-main));
+    border-color: hsl(var(--color-text-muted));
+}
+
+.text-muted {
+    color: hsl(var(--color-text-muted));
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+/* Form Elements */
+input,
+select,
+textarea {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid hsl(var(--color-border));
+    border-radius: var(--radius-md);
+    background-color: hsl(var(--color-bg-card));
+    color: hsl(var(--color-text-main));
+    font-family: inherit;
+    font-size: 1rem;
+    transition: var(--transition-base);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: hsl(var(--color-primary));
+    box-shadow: 0 0 0 2px hsl(var(--color-primary) / 0.1);
+}

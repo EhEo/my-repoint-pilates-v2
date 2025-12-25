@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  PAUSED
+}
+
+enum MembershipType {
+  GROUPS
+  PRIVATE
+  DUET
+}
+
+enum ClassLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+  WAITLIST
+}
+
+// Models
+
+model Member {
+  id                String         @id @default(uuid())
+  name              String
+  email             String         @unique
+  phone             String
+  avatar            String?
+  status            MemberStatus   @default(ACTIVE)
+  membershipType    MembershipType @default(GROUPS)
+  remainingSessions Int            @default(0)
+  totalSessions     Int            @default(0)
+  joinDate          DateTime       @default(now())
+  lastVisit         DateTime?
+  notes             String?
+  
+  reservations      Reservation[]
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model Instructor {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  specialties String[] 
+  avatar      String?
+  status      String   @default("active") // active, inactive, leave
+  
+  classes     ClassSession[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ClassSession {
+  id             String         @id @default(uuid())
+  title          String
+  date           DateTime       // YYYY-MM-DD handled as DateTime
+  startTime      String         // HH:mm
+  endTime        String         // HH:mm
+  capacity       Int
+  enrolled       Int            @default(0)
+  type           MembershipType
+  level          ClassLevel
+  room           String
+  
+  instructorId   String
+  instructor     Instructor     @relation(fields: [instructorId], references: [id])
+  
+  reservations   Reservation[]
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Reservation {
+  id             String            @id @default(uuid())
+  status         ReservationStatus @default(CONFIRMED)
+  timestamp      DateTime          @default(now())
+  
+  memberId       String
+  member         Member            @relation(fields: [memberId], references: [id])
+  
+  classSessionId String
+  classSession   ClassSession      @relation(fields: [classSessionId], references: [id])
+  
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
