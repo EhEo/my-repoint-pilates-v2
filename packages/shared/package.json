@@ -1,0 +1,8 @@
+{
+  "name": "@repoint/shared",
+  "private": true,
+  "version": "0.0.0",
+  "description": "RePoint Pilates 공유 타입 패키지 (admin/api 공통 enum 등)",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

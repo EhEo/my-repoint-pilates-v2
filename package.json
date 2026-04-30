@@ -1,34 +1,22 @@
 {
-  "name": "my-repoint-pilates-v2",
+  "name": "my-repoint-pilates",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "description": "필라테스 센터 운영 관리 시스템 — 랜딩 + 어드민 + API 통합 monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.562.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.11.0",
-    "recharts": "^3.6.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "dev:landing": "npm run dev -w @repoint/landing",
+    "dev:admin": "npm run dev -w @repoint/admin",
+    "dev:api": "npm run dev -w @repoint/api",
+    "build:admin": "npm run build -w @repoint/admin",
+    "build:api": "npm run build -w @repoint/api",
+    "lint:admin": "npm run lint -w @repoint/admin",
+    "prisma:generate": "npm run prisma:generate -w @repoint/api",
+    "prisma:migrate": "npm run prisma:migrate -w @repoint/api",
+    "prisma:studio": "npm run prisma:studio -w @repoint/api",
+    "prisma:seed": "npm run prisma:seed -w @repoint/api"
   }
 }

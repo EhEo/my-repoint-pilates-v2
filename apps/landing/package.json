@@ -1,0 +1,14 @@
+{
+  "name": "@repoint/landing",
+  "private": true,
+  "version": "0.0.0",
+  "description": "RePoint Pilates 홍보용 정적 PWA 랜딩 페이지",
+  "scripts": {
+    "dev": "serve -l 3001 .",
+    "start": "serve -l 3001 .",
+    "preview": "serve -l 8080 ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

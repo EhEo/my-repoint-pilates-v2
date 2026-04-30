@@ -57,3 +57,107 @@
 1. Initialize the repository structure.
 2. Define the basic Design System (Color Palette, Typography).
 3. Build the 'Shell' of the application (Layout, Navigation).
+
+---
+
+# 통합 계획 (my-repoint-Pilates 흡수)
+
+기존 [my-repoint-Pilates](https://github.com/EhEo/my-repoint-Pilates) 레포의 자산(홍보용 정적 PWA 랜딩 + JWT 인증 모듈)을 본 레포(`my-repoint-pilates-v2`)로 흡수해 **하나의 통합 프로젝트**로 만든다. 본 v2를 베이스로 삼고, Pilates 레포는 흡수 후 폐기 또는 archived 처리 예정.
+
+## 5. 통합 결정 사항
+
+| 항목 | 결정 |
+|---|---|
+| 베이스 레포 | `my-repoint-pilates-v2` |
+| 통합 작업 브랜치 | `feature/integrate-landing-and-auth` |
+| 인증 도입 | 예 (Pilates의 NestJS auth를 Express 미들웨어로 단순 포팅) |
+| Prisma enum 표기 | **대문자(UPPERCASE)** — v2 기존 컨벤션 유지 |
+| 회원권 모델 | **별도 `Membership` 테이블** 분리 (결제·기간 관리 확장 대비) |
+| 정적 랜딩 | `apps/landing/`로 흡수 (Pilates의 `index.html`, SW, manifest 등 그대로) |
+| Postgres 호스트 포트 | 5432 유지 (v2 기존 값) |
+
+## 6. 통합 단계 로드맵
+
+### ✅ Integration Phase 1 — Monorepo 재편성 (구조만) — 완료
+**목표**: 코드 변경 없이 디렉토리 구조만 재편성. 빌드/실행이 그대로 되는지 검증.
+
+- [x] v2를 npm workspaces로 변환
+- [x] 기존 v2 루트 프런트엔드를 `apps/admin/`으로 이동 (git mv, 내용 변경 없음)
+- [x] 기존 `server/`를 `apps/api/`로 이동
+- [x] Pilates 레포의 정적 랜딩 자산을 `apps/landing/`으로 복사 (`index.html`, `src/css/`, `src/js/`, `service-worker.js`, `manifest.json`, `offline.html`, `public/icons/`)
+- [x] `packages/shared/` 골격(공유 타입용)
+- [x] 루트 [package.json](../package.json) → workspaces 매니페스트 (`@repoint/admin`, `@repoint/api`, `@repoint/landing`, `@repoint/shared`)
+- [x] 루트 [docker-compose.yml](../docker-compose.yml) → landing(`:3001`) 추가, 기존 admin/api/db 유지
+- [x] [CLAUDE.md](../CLAUDE.md), [README.md](../README.md) 새 구조 반영 갱신
+- [x] `npm install` (워크스페이스, 419 packages, 0 vulnerabilities)
+
+**검증 결과**:
+- ✅ 워크스페이스 의존성 설치 성공
+- ⚠️ `npm run build:admin`/`build:api`에서 빌드 에러 3건 발견 — 이는 이번 통합 작업이 아니라 **v2 main에 원래 있던 코드 이슈**임 (`git diff --stat -M` 0 byte 변경으로 검증 완료). 아래 Phase 1.5에서 별도 처리.
+- ℹ️ Dev 모드(vite/ts-node)는 타입 에러를 차단하지 않으므로 정상 동작 가능 상태.
+
+### Integration Phase 1.5 — 기존 v2 빌드 에러 정리 (소규모)
+**목표**: v2 main에서 누적된 타입 에러 3건을 해소해 `npm run build:admin/build:api`가 green 통과하게 한다. Phase 2 이후 의존성/스키마 변경으로 새 빌드 에러가 섞이기 전에 깨끗한 baseline을 확보.
+
+- [ ] [apps/admin/src/components/Dashboard/RevenueChart.tsx:43](../apps/admin/src/components/Dashboard/RevenueChart.tsx) — Recharts `Tooltip formatter`의 시그니처 미스매치 수정 (정확한 `Formatter<ValueType, NameType>` 타입에 맞추거나 인라인 타입 캐스트)
+- [ ] [apps/admin/src/pages/Reservations.tsx:7](../apps/admin/src/pages/Reservations.tsx) — 사용되지 않는 `Reservation` import 제거
+- [ ] [apps/api/src/routes/dashboard.ts](../apps/api/src/routes/dashboard.ts) — `acc`, `curr`, `r` 파라미터의 `implicit any` 타입 명시 (or `noImplicitAny`를 임시로 완화하지 말고 정확한 타입 부여)
+- [ ] 검증: `npm run build:admin && npm run build:api` 각각 exit code 0
+- 작은 단위 커밋 1건으로 처리
+
+### Integration Phase 2 — JWT 인증 도입
+- Pilates의 NestJS auth (`@Inject` + Passport + Guard)를 Express 미들웨어로 단순 포팅
+- 추가 의존성: `bcryptjs`, `jsonwebtoken`, `@types/jsonwebtoken`
+- Prisma 추가: `User { id email password role createdAt updatedAt }` + `enum Role { ADMIN INSTRUCTOR MEMBER }`
+- 신규 라우트: `POST /api/auth/login`, `GET /api/auth/me`
+- 기존 `/api/*` 라우트에 `requireAuth + requireRole('ADMIN')` 미들웨어 적용
+- 어드민 SPA: `/login` 페이지 + `RequireAuth` 래퍼 + `localStorage` JWT
+- 시드 스크립트에 `ADMIN_EMAIL`/`ADMIN_PASSWORD`로 admin 계정 upsert 추가
+
+### Integration Phase 3 — Prisma 스키마: 회원권 분리 (PRD 3.2)
+- 기존 `Member.remainingSessions/totalSessions/membershipType` 컬럼은 제거
+- 신규 모델 `Membership { id memberId type totalCount? remainingCount? startDate endDate? status holdStartAt? holdEndAt? }`
+- enum `MembershipType { COUNT PERIOD MIXED }` (PRD 3.2.1)
+- enum `MembershipStatus { ACTIVE EXPIRED HOLD CANCELLED }`
+- 예약 생성/취소 트랜잭션 ([server/src/routes/reservations.ts](../server/src/routes/reservations.ts))을 `prisma.$transaction`으로 감싸 회원의 **현재 활성 회원권** 잔여 횟수를 갱신
+- 회원권 만료 임박/홀딩/연장 엔드포인트
+- 어드민 SPA에 회원권 페이지
+
+### Integration Phase 4 — 결제 모델 (PRD 3.6)
+- 신규 모델 `Payment { id memberId membershipId? method amount status installments? receiptNo paidAt refundedAt }`
+- enum `PaymentMethod { CASH CARD TRANSFER EASYPAY }`
+- enum `PaymentStatus { PAID PARTIAL_REFUND REFUNDED CANCELLED }`
+- 회원권 등록 시 결제 레코드 동시 생성
+- 환불 워크플로우 (전액/부분)
+- 어드민 SPA에 결제 페이지
+
+### Integration Phase 5 — 부가 기능 (선택, PRD 기반)
+- **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
+- **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델
+- **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁)
+- **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts`에 일/주/월/년 매출 집계
+
+### Integration Phase 6 — 정리
+
+- 기존 v2의 `apps/admin/src/utils/mock*Data.ts` 정리(완전 제거 또는 `src/__mocks__/`로 격리)
+- enum 일관성 점검 — 어드민 [apps/admin/src/types/index.ts](../apps/admin/src/types/index.ts)에서 ReservationStatus 양쪽 받는 부분 정리
+- ESLint 통과 / 타입체크 통과 (Phase 1.5에서 잡지 못한 잔여 이슈 + Phase 2~5에서 누적된 새 이슈)
+- 통합 후 기존 [my-repoint-Pilates](https://github.com/EhEo/my-repoint-Pilates) 레포 archived 처리
+
+## 7. 진행 원칙
+- **단계마다 커밋 후 검증**. Phase 단위로 사용자 확인 후 다음 Phase 진행
+- **PRD를 코드보다 앞세움**. PRD에 없는 기능은 추가하지 않음
+- **트랜잭션·정원 체크 등 알려진 빈틈은 흡수하면서 같이 메우기**. 예: Phase 3에서 reservations 트랜잭션화
+- **enum과 타입 단일 소스화**. Prisma 스키마 → `packages/shared`에서 타입 export → admin/api 양쪽 import
+
+## 8. 진행 상황 트래커
+
+| Phase | 상태 | 비고 |
+| --- | --- | --- |
+| Integration Phase 1 — Monorepo 재편성 | ✅ 완료 | `feature/integrate-landing-and-auth` 브랜치, 커밋 대기 중 |
+| Integration Phase 1.5 — 기존 빌드 에러 정리 | ⬜ 예정 | v2 main에서 누적된 타입 에러 3건 |
+| Integration Phase 2 — JWT 인증 도입 | ⬜ 예정 | Pilates의 NestJS auth → Express 미들웨어 포팅 |
+| Integration Phase 3 — Membership 테이블 분리 | ⬜ 예정 | PRD 3.2, 결제 확장 대비 |
+| Integration Phase 4 — Payment 모델 | ⬜ 예정 | PRD 3.6 |
+| Integration Phase 5 — 부가 기능 | ⬜ 예정 | 신체평가/강사스케줄/알림/대시보드 확장 |
+| Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |
