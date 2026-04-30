@@ -87,6 +87,7 @@ docker compose up
 본 저장소는 별도였던 [my-repoint-Pilates](https://github.com/EhEo/my-repoint-Pilates) (홍보 사이트 + NestJS 어드민)를 흡수해 단일 프로젝트로 통합 중이다. 작업 브랜치는 `feature/integrate-landing-and-auth`이며, 단계별 진행 상황은 [PLAN/PLAN.md](PLAN/PLAN.md)의 "통합 단계 로드맵" 섹션 참고.
 
 - ✅ **Integration Phase 1** — Monorepo 재편성
+- ⬜ **Integration Phase 1.5** — 기존 v2 빌드 에러 정리 (타입 에러 3건)
 - ⬜ **Integration Phase 2** — JWT 인증 도입
 - ⬜ **Integration Phase 3** — 회원권 별도 테이블 (Membership)
 - ⬜ **Integration Phase 4** — 결제 모델 (Payment)
