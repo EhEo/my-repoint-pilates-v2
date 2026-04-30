@@ -160,6 +160,36 @@ export const cancelReservation = (id: string) =>
 export const fetchDashboardStats = () => request<any>('/api/dashboard/stats');
 export const fetchRecentActivity = () => request<any[]>('/api/dashboard/recent-activity');
 
+// ── Assessments (Phase 5A — 신체 평가, 최소 범위) ─────────────────────────
+export const fetchAssessments = (memberId?: string) =>
+    request<any[]>(
+        memberId
+            ? `/api/assessments?memberId=${encodeURIComponent(memberId)}`
+            : '/api/assessments'
+    );
+export const createAssessment = (data: {
+    memberId: string;
+    date?: string;
+    heightCm?: number | null;
+    weightKg?: number | null;
+    bodyFatPct?: number | null;
+    muscleMassKg?: number | null;
+    notes?: string;
+}) => request<any>('/api/assessments', { method: 'POST', body: data });
+export const updateAssessment = (
+    id: string,
+    data: Partial<{
+        date: string;
+        heightCm: number | null;
+        weightKg: number | null;
+        bodyFatPct: number | null;
+        muscleMassKg: number | null;
+        notes: string | null;
+    }>
+) => request<any>(`/api/assessments/${id}`, { method: 'PATCH', body: data });
+export const deleteAssessment = (id: string) =>
+    request<any>(`/api/assessments/${id}`, { method: 'DELETE' });
+
 // ── Notifications (Phase 5C) ──────────────────────────────────────────────
 export const fetchNotifications = (params?: {
     recipientType?: string;

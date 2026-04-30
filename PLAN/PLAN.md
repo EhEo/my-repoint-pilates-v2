@@ -158,10 +158,31 @@
 
 ### Integration Phase 5 — 부가 기능 (선택, PRD 기반)
 
-- **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
+- ⚠️ **신체 평가** (PRD 3.1.4 일부): `Assessment` 모델 — Phase 5A 로 **최소 범위**만 도입 완료. **자세/유연성/근력/운동 처방/사진/리포트는 미도입** (PRD 의 큰 절반). 핵심 추적 지표(키/체중/BMI/체지방/근육량) + 메모만
 - ✅ **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델 — Phase 5B 로 분리 완료. 대강 신청/승인 워크플로우는 별도 단계로 미룸
 - ✅ **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁) — Phase 5C 로 분리 완료
 - ✅ **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts` 에 일/주/월/년 매출 집계 — Phase 5D 로 분리 완료
+
+#### ⚠️ Integration Phase 5A (minimal) — 신체 평가 (최소 범위) — 완료
+
+PRD 3.1.4 의 측정 항목은 30+ 개로 매우 광범위. 본 단계에서는 **장기 추적에 핵심인 지표 5개 + 메모만** 다루고 자세 분석/유연성/근력/운동 처방/사진 Before-After/PDF 리포트는 모두 미도입.
+
+- [x] Schema: `Assessment { id, memberId, date, heightCm?, weightKg?, bmi?, bodyFatPct?, muscleMassKg?, notes? }` ([apps/api/prisma/schema.prisma](../apps/api/prisma/schema.prisma)). Member 에 `assessments` 관계 + cascade 삭제. `(memberId, date)` 인덱스
+- [x] [routes/assessments.ts](../apps/api/src/routes/assessments.ts): CRUD + BMI 자동 계산 (height/weight 둘 다 있을 때 라우트 레이어에서 계산해 저장). PATCH 는 머지 후 BMI 재계산
+- [x] 어드민 [/assessments](../apps/admin/src/pages/Assessments.tsx) 페이지: 회원 picker + Trend 차트(체중/BMI/체지방을 좌·우 Y축 dual-axis line) + Add Measurement 폼 + History 테이블(삭제). Sidebar 에 HeartPulse 아이콘으로 엔트리 추가
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
+
+**비-범위 (PRD 3.1.4 의 미도입 영역)**:
+
+- 체형 분석 (어깨/골반/다리 길이/척추 측만)
+- 유연성 (전굴, 고관절/어깨/햄스트링 가동범위)
+- 근력 평가 (코어/상체/하체/균형 1-5점)
+- 자세 분석 (거북목/라운드숄더/골반 기울기/무릎 정렬)
+- 통증·병력 구조화 (현재 자유 텍스트 notes 로만)
+- 운동 처방 / 프로그램 설계 / 홈케어
+- Before-After 사진
+- PDF 리포트
+- 4주 평가 주기 알림
 
 #### ✅ Integration Phase 5C — 알림 시스템 — 완료
 
@@ -222,5 +243,5 @@
 | Integration Phase 5B — 강사 스케줄/휴무 | ✅ 완료 | InstructorSchedule + InstructorLeave + /schedules 페이지. 대강 워크플로우 미도입 |
 | Integration Phase 5D — 대시보드 매출 위젯 | ✅ 완료 | /api/dashboard/revenue 시계열, RevenueChart 실 데이터 + D/W/M/Y selector |
 | Integration Phase 5C — 알림 시스템 | ✅ 완료 | Notification 모델 + 예약 트리거 + 만료 scan, 채널 어댑터는 stub |
-| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 |
+| Integration Phase 5A (mini) — 신체 평가 | ⚠️ 부분 완료 | 핵심 지표 5종 + 메모만. 자세/유연성/근력/처방/사진/리포트 미도입 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

@@ -7,7 +7,8 @@ import {
     Settings,
     Dumbbell,
     Ticket,
-    Bell
+    Bell,
+    HeartPulse
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -15,6 +16,7 @@ const Sidebar = () => {
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: Users, label: 'Members', path: '/members' },
+        { icon: HeartPulse, label: 'Assessments', path: '/assessments' },
         { icon: Ticket, label: 'Memberships', path: '/memberships' },
         { icon: Calendar, label: 'Classes & Schedule', path: '/classes' },
         { icon: CalendarClock, label: 'Instructor Schedules', path: '/schedules' },

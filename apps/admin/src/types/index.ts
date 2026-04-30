@@ -75,6 +75,21 @@ export type NotificationChannel = 'APP' | 'SMS' | 'KAKAO' | 'EMAIL';
 export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED';
 export type RecipientType = 'MEMBER' | 'INSTRUCTOR' | 'ADMIN';
 
+export interface Assessment {
+    id: string;
+    memberId: string;
+    member?: { id: string; name: string };
+    date: string;
+    heightCm?: number | null;
+    weightKg?: number | null;
+    bmi?: number | null;
+    bodyFatPct?: number | null;
+    muscleMassKg?: number | null;
+    notes?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface Notification {
     id: string;
     type: NotificationType;

@@ -99,9 +99,32 @@ model Member {
 
   memberships  Membership[]
   reservations Reservation[]
+  assessments  Assessment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Phase 5A (minimal) — 신체 평가 (PRD 3.1.4 의 일부 항목만).
+// 자세/유연성/근력/처방/사진/리포트는 미도입. 핵심 추적 지표(키/체중/BMI/
+// 체지방률/근육량) + 자유 텍스트 메모만. BMI 는 height + weight 모두 있을
+// 때 라우트 레이어에서 자동 계산해 저장.
+model Assessment {
+  id          String   @id @default(uuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  date        DateTime @default(now())
+  heightCm    Float? // cm
+  weightKg    Float? // kg
+  bmi         Float? // kg/m^2 (자동 계산)
+  bodyFatPct  Float? // %
+  muscleMassKg Float? // kg
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId, date])
 }
 
 // Count-based membership (횟수권). Single active membership per member is
