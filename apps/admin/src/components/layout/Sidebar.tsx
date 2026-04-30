@@ -11,18 +11,20 @@ import {
     HeartPulse
 } from 'lucide-react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 const Sidebar = () => {
+    const { t } = useTranslation();
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-        { icon: Users, label: 'Members', path: '/members' },
-        { icon: HeartPulse, label: 'Assessments', path: '/assessments' },
-        { icon: Ticket, label: 'Memberships', path: '/memberships' },
-        { icon: Calendar, label: 'Classes & Schedule', path: '/classes' },
-        { icon: CalendarClock, label: 'Instructor Schedules', path: '/schedules' },
-        { icon: Dumbbell, label: 'Reservations', path: '/reservations' },
-        { icon: Bell, label: 'Notifications', path: '/notifications' },
-        { icon: Settings, label: 'Settings', path: '/settings' },
+        { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/' },
+        { icon: Users, label: t('nav.members'), path: '/members' },
+        { icon: HeartPulse, label: t('nav.assessments'), path: '/assessments' },
+        { icon: Ticket, label: t('nav.memberships'), path: '/memberships' },
+        { icon: Calendar, label: t('nav.classes'), path: '/classes' },
+        { icon: CalendarClock, label: t('nav.schedules'), path: '/schedules' },
+        { icon: Dumbbell, label: t('nav.reservations'), path: '/reservations' },
+        { icon: Bell, label: t('nav.notifications'), path: '/notifications' },
+        { icon: Settings, label: t('nav.settings'), path: '/settings' },
     ];
 
     return (

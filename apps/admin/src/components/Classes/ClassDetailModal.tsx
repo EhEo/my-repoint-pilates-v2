@@ -1,4 +1,5 @@
 import { Calendar, Clock, User, MapPin, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ClassSession } from '../../types';
 import Modal from '../common/Modal';
 
@@ -9,43 +10,46 @@ interface ClassDetailModalProps {
 }
 
 const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ session, isOpen, onClose }) => {
+    const { t } = useTranslation();
     if (!session) return null;
+    const levelKey = String(session.level).toLowerCase() as 'beginner' | 'intermediate' | 'advanced' | 'all';
+    const isPrivate = String(session.type).toUpperCase() === 'PRIVATE';
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Class Details">
+        <Modal isOpen={isOpen} onClose={onClose} title={t('classes.detail.title')}>
             <div className="class-detail">
                 <div className="detail-header">
-                    <span className="badge level-badge">{session.level}</span>
+                    <span className="badge level-badge">{t(`classes.card.level.${levelKey}` as 'classes.card.level.beginner', { defaultValue: session.level })}</span>
                     <h2>{session.title}</h2>
-                    <p className="text-muted">{session.type === 'private' ? '1:1 Private Session' : 'Group Class'}</p>
+                    <p className="text-muted">{isPrivate ? t('classes.detail.private') : t('classes.detail.group')}</p>
                 </div>
 
                 <div className="info-grid">
                     <div className="info-item">
                         <Calendar size={18} className="icon" />
                         <div>
-                            <label>Date</label>
+                            <label>{t('classes.detail.fields.date')}</label>
                             <p>{session.date}</p>
                         </div>
                     </div>
                     <div className="info-item">
                         <Clock size={18} className="icon" />
                         <div>
-                            <label>Time</label>
+                            <label>{t('classes.detail.fields.time')}</label>
                             <p>{session.startTime} - {session.endTime}</p>
                         </div>
                     </div>
                     <div className="info-item">
                         <User size={18} className="icon" />
                         <div>
-                            <label>Instructor</label>
+                            <label>{t('classes.detail.fields.instructor')}</label>
                             <p>{session.instructorName}</p>
                         </div>
                     </div>
                     <div className="info-item">
                         <MapPin size={18} className="icon" />
                         <div>
-                            <label>Room</label>
+                            <label>{t('classes.detail.fields.room')}</label>
                             <p>{session.room}</p>
                         </div>
                     </div>
@@ -53,15 +57,15 @@ const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ session, isOpen, on
 
                 <div className="attendees-section">
                     <div className="section-header">
-                        <h3>Attendees ({session.enrolled}/{session.capacity})</h3>
+                        <h3>{t('classes.detail.attendees', { enrolled: session.enrolled, capacity: session.capacity })}</h3>
                         {session.enrolled < session.capacity && (
-                            <button className="btn btn-sm btn-outline">Add Member</button>
+                            <button type="button" className="btn btn-sm btn-outline">{t('classes.detail.addMember')}</button>
                         )}
                     </div>
 
                     <div className="attendees-list">
                         {session.enrolled === 0 ? (
-                            <p className="empty-text">No members registered yet.</p>
+                            <p className="empty-text">{t('classes.detail.noAttendees')}</p>
                         ) : (
                             // Mock attendees for now
                             Array.from({ length: session.enrolled }).map((_, i) => (
@@ -69,8 +73,8 @@ const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ session, isOpen, on
                                     <div className="attendee-avatar">
                                         <User size={16} />
                                     </div>
-                                    <span>Member {i + 1}</span>
-                                    <button className="remove-btn"><X size={14} /></button>
+                                    <span>{t('classes.detail.memberLabel', { n: i + 1 })}</span>
+                                    <button type="button" className="remove-btn" aria-label={t('classes.detail.removeAria')}><X size={14} /></button>
                                 </div>
                             ))
                         )}
@@ -78,8 +82,8 @@ const ClassDetailModal: React.FC<ClassDetailModalProps> = ({ session, isOpen, on
                 </div>
 
                 <div className="modal-actions">
-                    <button className="btn btn-danger-outline">Cancel Class</button>
-                    <button className="btn btn-primary" onClick={onClose}>Close</button>
+                    <button type="button" className="btn btn-danger-outline">{t('classes.detail.cancelClass')}</button>
+                    <button type="button" className="btn btn-primary" onClick={onClose}>{t('classes.detail.close')}</button>
                 </div>
             </div>
 

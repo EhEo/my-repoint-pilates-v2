@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Clock, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Reservation } from '../../types';
 
 interface ReservationCardProps {
@@ -8,9 +9,11 @@ interface ReservationCardProps {
 }
 
 const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, onCancel }) => {
+  const { t } = useTranslation();
   const { classSession, status } = reservation;
   // Handle nested instructor object from API or flat property from mock
-  const instructorName = (classSession as any).instructor?.name || (classSession as any).instructorName || 'Unknown Instructor';
+  const instructorName = (classSession as any).instructor?.name || (classSession as any).instructorName || t('reservations.card.unknownInstructor');
+  const statusKey = String(status).toUpperCase();
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {
@@ -39,7 +42,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, onCancel
               borderColor: getStatusColor(status)
             }}
           >
-            {status}
+            {t(`reservations.status.${statusKey}` as 'reservations.status.CONFIRMED', { defaultValue: status })}
           </span>
         </div>
 
@@ -62,10 +65,11 @@ const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, onCancel
       <div className="actions-col">
         {status !== 'CANCELLED' && status !== 'cancelled' && (
           <button
+            type="button"
             className="btn btn-sm btn-outline-danger"
             onClick={() => onCancel(reservation.id)}
           >
-            Cancel
+            {t('reservations.card.cancel')}
           </button>
         )}
       </div>

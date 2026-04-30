@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import type { MemberStatus, MembershipType } from '../../types'; // Not used in implementation
+import { useTranslation } from 'react-i18next';
 
 interface MemberFormProps {
     onSubmit: (data: any) => void;
@@ -7,6 +7,7 @@ interface MemberFormProps {
 }
 
 const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -31,7 +32,7 @@ const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
     return (
         <form onSubmit={handleSubmit} className="member-form">
             <div className="form-group">
-                <label htmlFor="name">Full Name *</label>
+                <label htmlFor="name">{t('members.form.name')} *</label>
                 <input
                     type="text"
                     id="name"
@@ -39,12 +40,12 @@ const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. Jane Doe"
+                    placeholder={t('members.form.namePlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="phone">Phone Number *</label>
+                <label htmlFor="phone">{t('members.form.phone')} *</label>
                 <input
                     type="tel"
                     id="phone"
@@ -52,50 +53,48 @@ const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="010-0000-0000"
+                    placeholder={t('members.form.phonePlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('members.form.email')}</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="jane@example.com"
+                    placeholder={t('members.form.emailPlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="status">Status</label>
+                <label htmlFor="status">{t('members.form.status')}</label>
                 <select name="status" id="status" value={formData.status} onChange={handleChange}>
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                    <option value="PAUSED">Paused</option>
+                    <option value="ACTIVE">{t('members.status.ACTIVE')}</option>
+                    <option value="INACTIVE">{t('members.status.INACTIVE')}</option>
+                    <option value="PAUSED">{t('members.status.PAUSED')}</option>
                 </select>
             </div>
 
-            <p className="hint text-muted">
-                회원권(횟수권)은 회원 등록 후 별도의 Memberships 페이지에서 발급합니다.
-            </p>
+            <p className="hint text-muted">{t('members.form.membershipHint')}</p>
 
             <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('members.form.notes')}</label>
                 <textarea
                     id="notes"
                     name="notes"
                     rows={3}
                     value={formData.notes}
                     onChange={handleChange}
-                    placeholder="Any health notes or special requirements..."
+                    placeholder={t('members.form.notesPlaceholder')}
                 />
             </div>
 
             <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Register Member</button>
+                <button type="button" className="btn btn-secondary" onClick={onCancel}>{t('common.cancel')}</button>
+                <button type="submit" className="btn btn-primary">{t('members.form.submit')}</button>
             </div>
 
             <style>{`

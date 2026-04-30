@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import {
     fetchMemberships,
     createMembership,
@@ -12,6 +13,7 @@ import type { Member, Membership } from '../types';
 const toDateInput = (iso: string) => new Date(iso).toISOString().slice(0, 10);
 
 const Memberships = () => {
+    const { t } = useTranslation();
     const [memberships, setMemberships] = useState<Membership[]>([]);
     const [members, setMembers] = useState<Member[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -73,7 +75,7 @@ const Memberships = () => {
             setIssueTotalCount(10);
             await load();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to issue membership');
+            setError(err instanceof Error ? err.message : t('memberships.form.issueFailed'));
         } finally {
             setSubmitting(false);
         }
@@ -93,7 +95,7 @@ const Memberships = () => {
             await load();
         } catch (err) {
             console.error(err);
-            alert('Failed to update membership');
+            alert(t('memberships.edit.saveFailed'));
         }
     };
 
@@ -121,11 +123,11 @@ const Memberships = () => {
         <div className="memberships-page">
             <header className="page-header">
                 <div>
-                    <h1>Memberships</h1>
-                    <p className="text-muted">횟수권 발급·관리. 만료기간은 언제든 수정할 수 있습니다.</p>
+                    <h1>{t('memberships.title')}</h1>
+                    <p className="text-muted">{t('memberships.subtitle')}</p>
                 </div>
                 <button type="button" className="btn btn-primary" onClick={() => setIsIssueOpen(true)}>
-                    Issue Membership
+                    {t('memberships.issueButton')}
                 </button>
             </header>
 
@@ -135,33 +137,33 @@ const Memberships = () => {
                     className={clsx('tab', filter === 'ACTIVE' && 'active')}
                     onClick={() => setFilter('ACTIVE')}
                 >
-                    Active
+                    {t('memberships.tabs.active')}
                 </button>
                 <button
                     type="button"
                     className={clsx('tab', filter === 'ALL' && 'active')}
                     onClick={() => setFilter('ALL')}
                 >
-                    All
+                    {t('memberships.tabs.all')}
                 </button>
             </div>
 
             {isLoading ? (
-                <div className="loading">Loading…</div>
+                <div className="loading">{t('memberships.loading')}</div>
             ) : memberships.length === 0 ? (
-                <div className="empty-state">No memberships found.</div>
+                <div className="empty-state">{t('memberships.empty')}</div>
             ) : (
                 <div className="card table-card">
                     <table>
                         <thead>
                             <tr>
-                                <th>Member</th>
-                                <th>Remaining</th>
-                                <th>Total</th>
-                                <th>Start</th>
-                                <th>Expires</th>
-                                <th>Status</th>
-                                <th>Payment</th>
+                                <th>{t('memberships.table.member')}</th>
+                                <th>{t('memberships.table.remaining')}</th>
+                                <th>{t('memberships.table.total')}</th>
+                                <th>{t('memberships.table.start')}</th>
+                                <th>{t('memberships.table.expires')}</th>
+                                <th>{t('memberships.table.status')}</th>
+                                <th>{t('memberships.table.payment')}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -175,23 +177,23 @@ const Memberships = () => {
                                     <td>{new Date(m.endDate).toLocaleDateString()}</td>
                                     <td>
                                         <span className={clsx('status-badge', m.status.toLowerCase())}>
-                                            {m.status}
+                                            {t(`memberships.status.${m.status}` as 'memberships.status.ACTIVE', { defaultValue: m.status })}
                                         </span>
                                     </td>
                                     <td>
                                         {m.refundedAt ? (
                                             <span className="status-badge refunded">
-                                                Refunded {new Date(m.refundedAt).toLocaleDateString()}
+                                                {t('memberships.paymentBadge.refunded', { date: new Date(m.refundedAt).toLocaleDateString() })}
                                             </span>
                                         ) : m.paid ? (
-                                            <span className="status-badge paid">Paid</span>
+                                            <span className="status-badge paid">{t('memberships.paymentBadge.paid')}</span>
                                         ) : (
-                                            <span className="status-badge unpaid">Unpaid</span>
+                                            <span className="status-badge unpaid">{t('memberships.paymentBadge.unpaid')}</span>
                                         )}
                                     </td>
                                     <td>
                                         <button type="button" className="btn btn-secondary btn-sm" onClick={() => startEdit(m)}>
-                                            Edit
+                                            {t('memberships.table.edit')}
                                         </button>
                                     </td>
                                 </tr>
@@ -201,30 +203,28 @@ const Memberships = () => {
                 </div>
             )}
 
-            <Modal isOpen={isIssueOpen} onClose={() => setIsIssueOpen(false)} title="Issue Membership">
+            <Modal isOpen={isIssueOpen} onClose={() => setIsIssueOpen(false)} title={t('memberships.issueModalTitle')}>
                 <form onSubmit={handleIssue} className="issue-form">
                     <div className="form-group">
-                        <label htmlFor="member">Member *</label>
+                        <label htmlFor="member">{t('memberships.form.memberLabel')}</label>
                         <select
                             id="member"
                             required
                             value={issueMemberId}
                             onChange={(e) => setIssueMemberId(e.target.value)}
                         >
-                            <option value="">Select member…</option>
+                            <option value="">{t('memberships.form.memberPlaceholder')}</option>
                             {members.map((m) => (
                                 <option key={m.id} value={m.id}>
                                     {m.name} ({m.email})
                                 </option>
                             ))}
                         </select>
-                        <p className="hint text-muted">
-                            기존 활성 회원권이 있으면 자동으로 취소되고 새 회원권이 발급됩니다.
-                        </p>
+                        <p className="hint text-muted">{t('memberships.issueHint')}</p>
                     </div>
                     <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="totalCount">Total Sessions *</label>
+                            <label htmlFor="totalCount">{t('memberships.form.totalCount')}</label>
                             <input
                                 id="totalCount"
                                 type="number"
@@ -235,7 +235,7 @@ const Memberships = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="endDate">Expiry Date *</label>
+                            <label htmlFor="endDate">{t('memberships.form.expiryDate')}</label>
                             <input
                                 id="endDate"
                                 type="date"
@@ -248,26 +248,24 @@ const Memberships = () => {
                     {error && <div className="error">{error}</div>}
                     <div className="form-actions">
                         <button type="button" className="btn btn-secondary" onClick={() => setIsIssueOpen(false)}>
-                            Cancel
+                            {t('common.cancel')}
                         </button>
                         <button type="submit" className="btn btn-primary" disabled={submitting}>
-                            {submitting ? 'Issuing…' : 'Issue'}
+                            {submitting ? t('memberships.form.issuing') : t('memberships.form.issue')}
                         </button>
                     </div>
                 </form>
             </Modal>
 
-            <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Edit Membership">
+            <Modal isOpen={!!editing} onClose={() => setEditing(null)} title={t('memberships.edit.title')}>
                 {editing && (
                     <div className="edit-form">
-                        <p>
-                            <strong>{editing.member?.name}</strong> 의 회원권 정보를 수정합니다.
-                        </p>
+                        <p>{t('memberships.edit.intro', { name: editing.member?.name ?? '' })}</p>
 
                         <fieldset>
-                            <legend>Expiry</legend>
+                            <legend>{t('memberships.edit.expiryLegend')}</legend>
                             <div className="form-group">
-                                <label htmlFor="editEndDate">Expiry Date</label>
+                                <label htmlFor="editEndDate">{t('memberships.edit.expiryDate')}</label>
                                 <input
                                     id="editEndDate"
                                     type="date"
@@ -278,10 +276,8 @@ const Memberships = () => {
                         </fieldset>
 
                         <fieldset>
-                            <legend>Payment (수기)</legend>
-                            <p className="hint text-muted">
-                                결제 처리는 별도 결제 시스템 도입 전까지 수기로 표기합니다.
-                            </p>
+                            <legend>{t('memberships.edit.paymentLegend')}</legend>
+                            <p className="hint text-muted">{t('memberships.edit.paymentHint')}</p>
                             <div className="form-row">
                                 <div className="form-group">
                                     <label className="checkbox-label">
@@ -290,11 +286,11 @@ const Memberships = () => {
                                             checked={editPaid}
                                             onChange={(e) => setEditPaid(e.target.checked)}
                                         />
-                                        Paid
+                                        {t('memberships.edit.paid')}
                                     </label>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="editPaidAt">Paid Date</label>
+                                    <label htmlFor="editPaidAt">{t('memberships.edit.paidDate')}</label>
                                     <input
                                         id="editPaidAt"
                                         type="date"
@@ -304,50 +300,47 @@ const Memberships = () => {
                                 </div>
                             </div>
                             <button type="button" className="btn btn-secondary btn-sm" onClick={markPaidNow}>
-                                Mark paid today
+                                {t('memberships.edit.markPaidToday')}
                             </button>
                         </fieldset>
 
                         <fieldset>
-                            <legend>Refund (수기)</legend>
+                            <legend>{t('memberships.edit.refundLegend')}</legend>
                             <div className="form-group">
-                                <label htmlFor="editRefundedAt">Refunded Date</label>
+                                <label htmlFor="editRefundedAt">{t('memberships.edit.refundedDate')}</label>
                                 <input
                                     id="editRefundedAt"
                                     type="date"
                                     value={editRefundedAt}
                                     onChange={(e) => setEditRefundedAt(e.target.value)}
                                 />
-                                <p className="hint text-muted">
-                                    환불 처리 시 회원권 상태(Status)도 별도로 CANCELLED 로 변경하거나
-                                    그대로 둘지 결정하세요.
-                                </p>
+                                <p className="hint text-muted">{t('memberships.edit.refundHint')}</p>
                             </div>
                             <button type="button" className="btn btn-secondary btn-sm" onClick={markRefundedNow}>
-                                Mark refunded today
+                                {t('memberships.edit.markRefundedToday')}
                             </button>
                         </fieldset>
 
                         <fieldset>
-                            <legend>Note</legend>
+                            <legend>{t('memberships.edit.noteLegend')}</legend>
                             <div className="form-group">
-                                <label htmlFor="editNote">결제/환불 메모</label>
+                                <label htmlFor="editNote">{t('memberships.edit.noteLabel')}</label>
                                 <textarea
                                     id="editNote"
                                     rows={3}
                                     value={editNote}
                                     onChange={(e) => setEditNote(e.target.value)}
-                                    placeholder="결제 수단, 환불 사유 등..."
+                                    placeholder={t('memberships.edit.notePlaceholder')}
                                 />
                             </div>
                         </fieldset>
 
                         <div className="form-actions">
                             <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                             <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
-                                Save
+                                {t('common.save')}
                             </button>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Users, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { ClassSession } from '../../types';
 
 interface ClassCardProps {
@@ -8,7 +9,9 @@ interface ClassCardProps {
 }
 
 const ClassCard: React.FC<ClassCardProps> = ({ session, onClick }) => {
+  const { t } = useTranslation();
   const isFull = session.enrolled >= session.capacity;
+  const levelKey = String(session.level).toLowerCase() as 'beginner' | 'intermediate' | 'advanced' | 'all';
 
   // Level badge color
   const getLevelColor = (level: string) => {
@@ -23,14 +26,14 @@ const ClassCard: React.FC<ClassCardProps> = ({ session, onClick }) => {
     <div className="class-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="time-col">
         <span className="start-time">{session.startTime}</span>
-        <span className="duration">50min</span>
+        <span className="duration">{t('classes.card.duration', { count: 50 })}</span>
       </div>
 
       <div className="info-col">
         <div className="header-row">
           <h3 className="title">{session.title}</h3>
           <span className="badge level-badge" style={{ borderColor: getLevelColor(session.level), color: getLevelColor(session.level) }}>
-            {session.level}
+            {t(`classes.card.level.${levelKey}` as 'classes.card.level.beginner', { defaultValue: session.level })}
           </span>
         </div>
 
@@ -51,10 +54,10 @@ const ClassCard: React.FC<ClassCardProps> = ({ session, onClick }) => {
           <Users size={16} />
           <span>{session.enrolled}/{session.capacity}</span>
         </div>
-        <button className="btn btn-sm btn-outline" onClick={(e) => {
+        <button type="button" className="btn btn-sm btn-outline" onClick={(e) => {
           e.stopPropagation();
           onClick?.();
-        }}>Detail</button>
+        }}>{t('classes.card.detail')}</button>
       </div>
 
       <style>{`

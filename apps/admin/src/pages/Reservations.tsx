@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import ReservationCard from '../components/Reservations/ReservationCard';
 import Modal from '../components/common/Modal';
 import { fetchReservations, cancelReservation } from '../utils/api';
 // import { MOCK_RESERVATIONS } from '../utils/mockReservationData';
 
 const Reservations = () => {
+    const { t } = useTranslation();
     const [reservations, setReservations] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<'upcoming' | 'history'>('upcoming');
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -53,10 +55,10 @@ const Reservations = () => {
             try {
                 await cancelReservation(selectedReservationId);
                 await loadReservations(); // Refresh list
-                alert('Reservation cancelled successfully!');
+                alert(t('reservations.cancelModal.success'));
             } catch (error) {
                 console.error('Failed to cancel reservation:', error);
-                alert('Failed to cancel reservation');
+                alert(t('reservations.cancelModal.failed'));
             } finally {
                 setIsCancelModalOpen(false);
                 setSelectedReservationId(null);
@@ -67,28 +69,30 @@ const Reservations = () => {
     return (
         <div className="reservations-page">
             <header className="page-header">
-                <h1>My Reservations</h1>
-                <p className="text-muted">Manage your bookings and view attending history.</p>
+                <h1>{t('reservations.title')}</h1>
+                <p className="text-muted">{t('reservations.subtitle')}</p>
             </header>
 
             <div className="tabs">
                 <button
+                    type="button"
                     className={clsx('tab', activeTab === 'upcoming' && 'active')}
                     onClick={() => setActiveTab('upcoming')}
                 >
-                    Upcoming
+                    {t('reservations.tabs.upcoming')}
                 </button>
                 <button
+                    type="button"
                     className={clsx('tab', activeTab === 'history' && 'active')}
                     onClick={() => setActiveTab('history')}
                 >
-                    History
+                    {t('reservations.tabs.history')}
                 </button>
             </div>
 
             <div className="reservations-list">
                 {isLoading ? (
-                    <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading bookings...</div>
+                    <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>{t('reservations.loading')}</div>
                 ) : displayedReservations.length > 0 ? (
                     displayedReservations.map(reservation => (
                         <ReservationCard
@@ -99,7 +103,7 @@ const Reservations = () => {
                     ))
                 ) : (
                     <div className="empty-state">
-                        <p>No {activeTab} reservations found.</p>
+                        <p>{t('reservations.empty', { tab: t(`reservations.tabs.${activeTab}` as 'reservations.tabs.upcoming') })}</p>
                     </div>
                 )}
             </div>
@@ -107,15 +111,15 @@ const Reservations = () => {
             <Modal
                 isOpen={isCancelModalOpen}
                 onClose={() => setIsCancelModalOpen(false)}
-                title="Cancel Reservation"
+                title={t('reservations.cancelModal.title')}
             >
                 <div className="cancel-modal-content">
-                    <p>Are you sure you want to cancel this reservation?</p>
-                    <p className="text-muted text-sm mt-2">This action cannot be undone.</p>
+                    <p>{t('reservations.cancelModal.confirmQuestion')}</p>
+                    <p className="text-muted text-sm mt-2">{t('reservations.cancelModal.warning')}</p>
 
                     <div className="modal-actions mt-6">
-                        <button className="btn btn-secondary" onClick={() => setIsCancelModalOpen(false)}>No, Keep it</button>
-                        <button className="btn btn-danger" onClick={confirmCancel}>Yes, Cancel</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => setIsCancelModalOpen(false)}>{t('reservations.cancelModal.keep')}</button>
+                        <button type="button" className="btn btn-danger" onClick={confirmCancel}>{t('reservations.cancelModal.confirm')}</button>
                     </div>
                 </div>
             </Modal>

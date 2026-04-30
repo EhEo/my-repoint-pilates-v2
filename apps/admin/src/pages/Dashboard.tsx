@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Users, Calendar, DollarSign, TrendingUp, Bell, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import RevenueChart from '../components/Dashboard/RevenueChart';
 import AttendanceChart from '../components/Dashboard/AttendanceChart';
 import { fetchDashboardStats, fetchRecentActivity } from '../utils/api';
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<any>({
     totalMembers: 0,
     classesToday: 0,
@@ -55,30 +57,33 @@ const Dashboard = () => {
 
   const dashboardStats = [
     {
-      label: 'Total Members',
+      label: t('dashboard.stats.totalMembers'),
       value: stats.totalMembers,
-      change: '+12% from last month',
+      change: t('dashboard.trends.totalMembersChange'),
       trend: 'positive',
       iconType: 'users'
     },
     {
-      label: 'Classes Today',
+      label: t('dashboard.stats.classesToday'),
       value: stats.classesToday,
-      change: '4 scheduled',
+      change: t('dashboard.trends.classesScheduled', { count: stats.classesToday }),
       trend: 'neutral',
       iconType: 'calendar'
     },
     {
-      label: 'Revenue (Est.)',
+      label: t('dashboard.stats.revenue'),
       value: `₩${(stats.revenue ?? 0).toLocaleString('ko-KR')}`,
-      change: '활성 회원권 합계 기준 (mock)',
+      change: t('dashboard.trends.revenueNote'),
       trend: 'neutral',
       iconType: 'dollar'
     },
     {
-      label: 'Pending Requests',
+      label: t('dashboard.stats.pendingRequests'),
       value: stats.pendingRequests,
-      change: `${stats.pendingRequests} items need action`,
+      change:
+        stats.pendingRequests > 0
+          ? t('dashboard.trends.pendingNeedAction', { count: stats.pendingRequests })
+          : t('dashboard.trends.noPending'),
       trend: stats.pendingRequests > 0 ? 'negative' : 'neutral',
       iconType: 'bell'
     }
@@ -88,14 +93,14 @@ const Dashboard = () => {
     <div>
       <header className="page-header">
         <div>
-          <h1>Dashboard</h1>
-          <p className="text-muted">Welcome back, Admin. Here's what's happening today.</p>
+          <h1>{t('dashboard.title')}</h1>
+          <p className="text-muted">{t('dashboard.subtitle')}</p>
         </div>
-        <button className="btn btn-primary">Download Report</button>
+        <button type="button" className="btn btn-primary">{t('dashboard.downloadReport')}</button>
       </header>
 
       {isLoading ? (
-        <div style={{ textAlign: 'center', padding: 'var(--space-12)' }}>Loading dashboard...</div>
+        <div style={{ textAlign: 'center', padding: 'var(--space-12)' }}>{t('dashboard.loading')}</div>
       ) : (
         <>
           {/* Stats Grid */}
@@ -129,8 +134,8 @@ const Dashboard = () => {
           {/* Recent Activity Section */}
           <div className="recent-activity">
             <div className="section-header">
-              <h3>Recent Activity</h3>
-              <button className="btn btn-ghost btn-sm">View All</button>
+              <h3>{t('dashboard.recentActivity')}</h3>
+              <button type="button" className="btn btn-ghost btn-sm">{t('dashboard.viewAll')}</button>
             </div>
             <div className="activity-list">
               {recentActivity.length > 0 ? (
@@ -148,7 +153,7 @@ const Dashboard = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-muted" style={{ padding: 'var(--space-4)', textAlign: 'center' }}>No recent activity.</p>
+                <p className="text-muted" style={{ padding: 'var(--space-4)', textAlign: 'center' }}>{t('dashboard.noActivity')}</p>
               )}
             </div>
           </div>

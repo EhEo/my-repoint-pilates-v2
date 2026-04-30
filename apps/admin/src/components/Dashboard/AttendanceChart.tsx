@@ -1,11 +1,13 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { MOCK_ATTENDANCE_DATA } from '../../utils/mockDashboardData';
 
 const AttendanceChart: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <div className="chart-container">
-            <h3>Weekly Attendance by Type</h3>
+            <h3>{t('charts.weeklyAttendance')}</h3>
             <div className="chart-wrapper">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
@@ -36,8 +38,8 @@ const AttendanceChart: React.FC = () => {
                             }}
                         />
                         <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                        <Bar dataKey="Group" stackId="a" fill="var(--color-primary)" radius={[0, 0, 4, 4]} />
-                        <Bar dataKey="Private" stackId="a" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="Group" name={t('charts.labels.group')} stackId="a" fill="var(--color-primary)" radius={[0, 0, 4, 4]} />
+                        <Bar dataKey="Private" name={t('charts.labels.private')} stackId="a" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>

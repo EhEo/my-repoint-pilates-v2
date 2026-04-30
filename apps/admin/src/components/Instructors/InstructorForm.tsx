@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Instructor } from '../../types';
 
 interface InstructorFormProps {
@@ -7,6 +8,7 @@ interface InstructorFormProps {
 }
 
 const InstructorForm: React.FC<InstructorFormProps> = ({ onSubmit, onCancel }) => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -35,7 +37,7 @@ const InstructorForm: React.FC<InstructorFormProps> = ({ onSubmit, onCancel }) =
     return (
         <form onSubmit={handleSubmit} className="instructor-form">
             <div className="form-group">
-                <label htmlFor="name">Full Name *</label>
+                <label htmlFor="name">{t('instructors.form.name')}</label>
                 <input
                     type="text"
                     id="name"
@@ -43,12 +45,12 @@ const InstructorForm: React.FC<InstructorFormProps> = ({ onSubmit, onCancel }) =
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g. John Doe"
+                    placeholder={t('instructors.form.namePlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="email">Email *</label>
+                <label htmlFor="email">{t('instructors.form.email')}</label>
                 <input
                     type="email"
                     id="email"
@@ -56,34 +58,34 @@ const InstructorForm: React.FC<InstructorFormProps> = ({ onSubmit, onCancel }) =
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="john@example.com"
+                    placeholder={t('instructors.form.emailPlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="specialties">Specialties (comma separated)</label>
+                <label htmlFor="specialties">{t('instructors.form.specialties')}</label>
                 <input
                     type="text"
                     id="specialties"
                     name="specialties"
                     value={formData.specialties}
                     onChange={handleChange}
-                    placeholder="e.g. Reformer, Cadillac, Rehab"
+                    placeholder={t('instructors.form.specialtiesPlaceholder')}
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="status">Status</label>
+                <label htmlFor="status">{t('instructors.form.status')}</label>
                 <select name="status" id="status" value={formData.status} onChange={handleChange}>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="leave">On Leave</option>
+                    <option value="active">{t('instructors.status.active')}</option>
+                    <option value="inactive">{t('instructors.status.inactive')}</option>
+                    <option value="leave">{t('instructors.status.leave')}</option>
                 </select>
             </div>
 
             <div className="form-actions">
-                <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Register Instructor</button>
+                <button type="button" className="btn btn-secondary" onClick={onCancel}>{t('common.cancel')}</button>
+                <button type="submit" className="btn btn-primary">{t('instructors.form.submit')}</button>
             </div>
 
             <style>{`

@@ -163,6 +163,24 @@
 - ✅ **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁) — Phase 5C 로 분리 완료
 - ✅ **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts` 에 일/주/월/년 매출 집계 — Phase 5D 로 분리 완료
 
+#### ✅ Integration Phase 5E — 어드민 i18n (한/영 전환) — 완료
+
+기존 어드민 UI 표면이 거의 영어였고 일부 보조 텍스트만 한국어인 상태였음. `react-i18next` 도입해 페이지·컴포넌트 표면을 모두 토큰 기반으로 바꾸고 한·영 토글 추가.
+
+- [x] 의존성: `react-i18next`, `i18next`, `i18next-browser-languagedetector`
+- [x] [src/i18n/index.ts](../apps/admin/src/i18n/index.ts) — 초기화, fallback `ko`, `localStorage` 로 언어 영속화 (key: `repoint.lang`)
+- [x] [locales/ko.json](../apps/admin/src/i18n/locales/ko.json) / [locales/en.json](../apps/admin/src/i18n/locales/en.json) — 네임스페이스(`common`, `nav`, `auth`, `dashboard`, `charts`, `members`, `memberships`, `assessments`, `schedules`, `notifications`, `reservations`, `classes`, `instructors`, `modal`, `header`)로 구성
+- [x] [LanguageToggle](../apps/admin/src/components/layout/LanguageToggle.tsx) — Header 에 Globe 아이콘 + 현재 언어 코드 표시, 클릭 시 ko ↔ en
+- [x] `tsconfig.app.json` 에 `resolveJsonModule: true` 추가
+- [x] 번역 적용: Sidebar, Header, Login, Dashboard, RevenueChart, AttendanceChart, Members + MemberCard + MemberForm, Memberships, Assessments, Schedules, Notifications, Reservations + ReservationCard, Classes + ClassCard + ClassDetailModal, InstructorCard + InstructorForm, Modal
+- [x] enum-derived 표시(`status`, `type`, `recipient`, `level`, `dayOfWeek`)는 raw value 를 className 으로 유지하면서 `t()` 로만 라벨 번역. 백엔드가 발행하는 알림 본문 등은 한국어 그대로 (사용자별 lang 선호도 미전달이라 발행 시점 언어가 적절)
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
+
+**비-범위 / 알려진 누락**:
+
+- 백엔드 발행 메시지(알림 title/body)는 한국어 고정. 후일 user 의 lang preference 가 도입되면 발행 시 분기 가능
+- `/settings` placeholder 한 줄(`<div>Settings Page (Coming Soon)</div>`)은 placeholder 라 그대로 둠
+
 #### ⚠️ Integration Phase 5A (minimal) — 신체 평가 (최소 범위) — 완료
 
 PRD 3.1.4 의 측정 항목은 30+ 개로 매우 광범위. 본 단계에서는 **장기 추적에 핵심인 지표 5개 + 메모만** 다루고 자세 분석/유연성/근력/운동 처방/사진 Before-After/PDF 리포트는 모두 미도입.
@@ -244,4 +262,5 @@ PRD 3.1.4 의 측정 항목은 30+ 개로 매우 광범위. 본 단계에서는 
 | Integration Phase 5D — 대시보드 매출 위젯 | ✅ 완료 | /api/dashboard/revenue 시계열, RevenueChart 실 데이터 + D/W/M/Y selector |
 | Integration Phase 5C — 알림 시스템 | ✅ 완료 | Notification 모델 + 예약 트리거 + 만료 scan, 채널 어댑터는 stub |
 | Integration Phase 5A (mini) — 신체 평가 | ⚠️ 부분 완료 | 핵심 지표 5종 + 메모만. 자세/유연성/근력/처방/사진/리포트 미도입 |
+| Integration Phase 5E — 어드민 i18n | ✅ 완료 | react-i18next, ko/en 토글, 모든 라우트된 페이지 + 컴포넌트 번역 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

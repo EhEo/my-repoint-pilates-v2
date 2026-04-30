@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import MemberCard from '../components/Members/MemberCard';
 import Modal from '../components/common/Modal';
 import MemberForm from '../components/Members/MemberForm';
@@ -7,6 +8,7 @@ import { fetchMembers, createMember } from '../utils/api';
 import type { MemberStatus } from '../types';
 
 const Members = () => {
+    const { t } = useTranslation();
     const [members, setMembers] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<MemberStatus | 'all'>('all');
@@ -35,7 +37,7 @@ const Members = () => {
             setIsModalOpen(false);
         } catch (error) {
             console.error('Failed to register member:', error);
-            alert('Failed to register member');
+            alert(t('members.form.registerFailed'));
         }
     };
 
@@ -52,12 +54,12 @@ const Members = () => {
         <div className="members-page">
             <header className="page-header">
                 <div>
-                    <h1>Members</h1>
-                    <p className="text-muted">Manage your client base and memberships.</p>
+                    <h1>{t('members.title')}</h1>
+                    <p className="text-muted">{t('members.subtitle')}</p>
                 </div>
-                <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+                <button type="button" className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
                     <Plus size={20} style={{ marginRight: '8px' }} />
-                    Add Member
+                    {t('members.addMember')}
                 </button>
             </header>
 
@@ -66,7 +68,7 @@ const Members = () => {
                     <Search size={20} className="text-muted icon" />
                     <input
                         type="text"
-                        placeholder="Search by name or email..."
+                        placeholder={t('members.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -75,20 +77,21 @@ const Members = () => {
                 <div className="filter-wrapper">
                     <Filter size={20} className="text-muted icon" />
                     <select
+                        aria-label={t('common.status')}
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value as MemberStatus | 'all')}
                     >
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="paused">Paused</option>
+                        <option value="all">{t('members.filter.allStatus')}</option>
+                        <option value="active">{t('members.filter.active')}</option>
+                        <option value="inactive">{t('members.filter.inactive')}</option>
+                        <option value="paused">{t('members.filter.paused')}</option>
                     </select>
                 </div>
             </div>
 
             {isLoading ? (
                 <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)' }}>
-                    Loading members...
+                    {t('members.loading')}
                 </div>
             ) : (
                 <div className="members-grid">
@@ -97,7 +100,7 @@ const Members = () => {
                     ))}
                     {filteredMembers.length === 0 && (
                         <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-muted)' }}>
-                            No members found.
+                            {t('members.empty')}
                         </div>
                     )}
                 </div>
@@ -106,7 +109,7 @@ const Members = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title="Register New Member"
+                title={t('members.registerNew')}
             >
                 <MemberForm
                     onSubmit={handleRegisterMember}

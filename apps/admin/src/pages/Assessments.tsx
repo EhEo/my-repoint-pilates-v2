@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     LineChart,
     Line,
@@ -21,6 +22,7 @@ import type { Member, Assessment } from '../types';
 const todayInput = () => new Date().toISOString().slice(0, 10);
 
 const Assessments = () => {
+    const { t } = useTranslation();
     const [members, setMembers] = useState<Member[]>([]);
     const [selectedId, setSelectedId] = useState<string>('');
     const [items, setItems] = useState<Assessment[]>([]);
@@ -103,14 +105,14 @@ const Assessments = () => {
             setDate(todayInput());
             await loadFor(selectedId);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to add assessment');
+            setError(err instanceof Error ? err.message : t('assessments.add.createFailed'));
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('이 측정 기록을 삭제하시겠습니까?')) return;
+        if (!confirm(t('assessments.history.deleteConfirm'))) return;
         await deleteAssessment(id);
         if (selectedId) await loadFor(selectedId);
     };
@@ -119,22 +121,19 @@ const Assessments = () => {
         <div className="assessments-page">
             <header className="page-header">
                 <div>
-                    <h1>Body Assessments</h1>
-                    <p className="text-muted">
-                        회원별 신체 측정 기록과 추이. 최소 범위(키/체중/BMI/체지방/근육량)만 다루며 자세·유연성·운동
-                        처방·사진은 미도입.
-                    </p>
+                    <h1>{t('assessments.title')}</h1>
+                    <p className="text-muted">{t('assessments.subtitle')}</p>
                 </div>
             </header>
 
             <div className="member-picker">
-                <label htmlFor="member">Member</label>
+                <label htmlFor="member">{t('assessments.memberLabel')}</label>
                 <select
                     id="member"
                     value={selectedId}
                     onChange={(e) => setSelectedId(e.target.value)}
                 >
-                    {members.length === 0 && <option value="">— No members —</option>}
+                    {members.length === 0 && <option value="">{t('assessments.noMembers')}</option>}
                     {members.map((m) => (
                         <option key={m.id} value={m.id}>
                             {m.name}
@@ -144,15 +143,15 @@ const Assessments = () => {
             </div>
 
             {isLoading ? (
-                <div className="empty">Loading…</div>
+                <div className="empty">{t('assessments.loading')}</div>
             ) : (
                 <div className="grid">
                     <section className="card panel">
-                        <h2>Trend</h2>
-                        <p className="text-muted hint">체중(kg) · BMI · 체지방률(%)</p>
+                        <h2>{t('assessments.trend.title')}</h2>
+                        <p className="text-muted hint">{t('assessments.trend.hint')}</p>
                         <div className="chart-wrapper">
                             {!hasNumeric ? (
-                                <div className="empty">기록이 없거나 수치 데이터가 없습니다.</div>
+                                <div className="empty">{t('assessments.trend.empty')}</div>
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -166,7 +165,7 @@ const Assessments = () => {
                                             yAxisId="left"
                                             type="monotone"
                                             dataKey="weight"
-                                            name="체중 (kg)"
+                                            name={t('charts.labels.weight')}
                                             stroke="hsl(var(--color-primary))"
                                             connectNulls
                                             dot
@@ -175,7 +174,7 @@ const Assessments = () => {
                                             yAxisId="right"
                                             type="monotone"
                                             dataKey="bmi"
-                                            name="BMI"
+                                            name={t('charts.labels.bmi')}
                                             stroke="hsl(var(--color-accent))"
                                             connectNulls
                                             dot
@@ -184,7 +183,7 @@ const Assessments = () => {
                                             yAxisId="right"
                                             type="monotone"
                                             dataKey="bodyFat"
-                                            name="체지방 (%)"
+                                            name={t('charts.labels.bodyFat')}
                                             stroke="hsl(var(--color-warning))"
                                             connectNulls
                                             dot
@@ -196,18 +195,18 @@ const Assessments = () => {
                     </section>
 
                     <section className="card panel">
-                        <h2>Add Measurement</h2>
-                        <p className="text-muted hint">BMI 는 키와 체중이 함께 입력되면 자동 계산됩니다.</p>
+                        <h2>{t('assessments.add.title')}</h2>
+                        <p className="text-muted hint">{t('assessments.add.hint')}</p>
                         <form onSubmit={handleSubmit} className="add-form">
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="date">Date</label>
+                                    <label htmlFor="date">{t('assessments.add.date')}</label>
                                     <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
                                 </div>
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="heightCm">Height (cm)</label>
+                                    <label htmlFor="heightCm">{t('assessments.add.height')}</label>
                                     <input
                                         id="heightCm"
                                         type="number"
@@ -218,7 +217,7 @@ const Assessments = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="weightKg">Weight (kg)</label>
+                                    <label htmlFor="weightKg">{t('assessments.add.weight')}</label>
                                     <input
                                         id="weightKg"
                                         type="number"
@@ -231,7 +230,7 @@ const Assessments = () => {
                             </div>
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="bodyFatPct">Body Fat (%)</label>
+                                    <label htmlFor="bodyFatPct">{t('assessments.add.bodyFat')}</label>
                                     <input
                                         id="bodyFatPct"
                                         type="number"
@@ -242,7 +241,7 @@ const Assessments = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="muscleMassKg">Muscle Mass (kg)</label>
+                                    <label htmlFor="muscleMassKg">{t('assessments.add.muscle')}</label>
                                     <input
                                         id="muscleMassKg"
                                         type="number"
@@ -254,18 +253,18 @@ const Assessments = () => {
                                 </div>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="notes">Notes</label>
+                                <label htmlFor="notes">{t('assessments.add.notes')}</label>
                                 <textarea
                                     id="notes"
                                     rows={2}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="특이사항, 통증 부위 등..."
+                                    placeholder={t('assessments.add.notesPlaceholder')}
                                 />
                             </div>
                             {error && <div className="error">{error}</div>}
                             <button type="submit" className="btn btn-primary" disabled={submitting || !selectedId}>
-                                {submitting ? 'Saving…' : 'Add measurement'}
+                                {submitting ? t('assessments.add.submitting') : t('assessments.add.submit')}
                             </button>
                         </form>
                     </section>
@@ -273,20 +272,20 @@ const Assessments = () => {
             )}
 
             <section className="card panel history">
-                <h2>History</h2>
+                <h2>{t('assessments.history.title')}</h2>
                 {items.length === 0 ? (
-                    <div className="empty">기록이 없습니다.</div>
+                    <div className="empty">{t('assessments.history.empty')}</div>
                 ) : (
                     <table>
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Height</th>
-                                <th>Weight</th>
-                                <th>BMI</th>
-                                <th>Body Fat</th>
-                                <th>Muscle</th>
-                                <th>Notes</th>
+                                <th>{t('assessments.history.table.date')}</th>
+                                <th>{t('assessments.history.table.height')}</th>
+                                <th>{t('assessments.history.table.weight')}</th>
+                                <th>{t('assessments.history.table.bmi')}</th>
+                                <th>{t('assessments.history.table.bodyFat')}</th>
+                                <th>{t('assessments.history.table.muscle')}</th>
+                                <th>{t('assessments.history.table.notes')}</th>
                                 <th></th>
                             </tr>
                         </thead>

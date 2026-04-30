@@ -1,14 +1,17 @@
 import { MoreHorizontal, Calendar } from 'lucide-react';
 import type { Member } from '../../types';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface MemberCardProps {
     member: Member;
 }
 
 const MemberCard = ({ member }: MemberCardProps) => {
+    const { t } = useTranslation();
     const activeMembership = member.memberships?.[0];
     const statusKey = (member.status || '').toString().toLowerCase();
+    const statusUpper = (member.status || '').toString().toUpperCase();
 
     return (
         <div className="card member-card">
@@ -20,11 +23,11 @@ const MemberCard = ({ member }: MemberCardProps) => {
                     <div>
                         <h3>{member.name}</h3>
                         <span className={clsx('status-badge', statusKey)}>
-                            {member.status}
+                            {t(`members.status.${statusUpper}` as 'members.status.ACTIVE', { defaultValue: member.status })}
                         </span>
                     </div>
                 </div>
-                <button type="button" className="icon-btn" aria-label="Member actions">
+                <button type="button" className="icon-btn" aria-label={t('members.card.actions')}>
                     <MoreHorizontal size={20} />
                 </button>
             </div>
@@ -32,7 +35,7 @@ const MemberCard = ({ member }: MemberCardProps) => {
             <div className="card-body">
                 <div className="stat-row">
                     <div className="stat-item">
-                        <span className="label">Sessions</span>
+                        <span className="label">{t('members.card.sessions')}</span>
                         <span className="value">
                             {activeMembership ? (
                                 <>
@@ -40,12 +43,12 @@ const MemberCard = ({ member }: MemberCardProps) => {
                                     <span className="text-muted">/ {activeMembership.totalCount}</span>
                                 </>
                             ) : (
-                                <span className="text-muted">No active membership</span>
+                                <span className="text-muted">{t('members.card.noActiveMembership')}</span>
                             )}
                         </span>
                     </div>
                     <div className="stat-item right">
-                        <span className="label">Expires</span>
+                        <span className="label">{t('members.card.expires')}</span>
                         <span className="value">
                             {activeMembership
                                 ? new Date(activeMembership.endDate).toLocaleDateString()
@@ -61,18 +64,18 @@ const MemberCard = ({ member }: MemberCardProps) => {
                         <Calendar size={16} />
                     </div>
                     <div className="session-info">
-                        <span className="label">Last Visit</span>
+                        <span className="label">{t('members.card.lastVisit')}</span>
                         <span className="value">
                             {member.lastVisit
                                 ? new Date(member.lastVisit).toLocaleDateString()
-                                : 'Never'}
+                                : t('members.card.never')}
                         </span>
                     </div>
                 </div>
             </div>
 
             <div className="card-footer">
-                <button type="button" className="btn btn-secondary full-width">View Profile</button>
+                <button type="button" className="btn btn-secondary full-width">{t('members.card.viewProfile')}</button>
             </div>
 
             <style>{`

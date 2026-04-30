@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { login } from '../utils/api';
 
 interface LocationState {
@@ -9,6 +10,7 @@ interface LocationState {
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
     const from = (location.state as LocationState | null)?.from?.pathname ?? '/';
 
     const [email, setEmail] = useState('');
@@ -24,7 +26,7 @@ const Login = () => {
             await login(email, password);
             navigate(from, { replace: true });
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Login failed');
+            setError(err instanceof Error ? err.message : t('auth.loginFailed'));
         } finally {
             setSubmitting(false);
         }
@@ -33,11 +35,11 @@ const Login = () => {
     return (
         <div className="login-page">
             <form className="login-card" onSubmit={handleSubmit}>
-                <h1>Repoint Admin</h1>
-                <p className="text-muted">관리자 계정으로 로그인하세요.</p>
+                <h1>{t('auth.title')}</h1>
+                <p className="text-muted">{t('auth.subtitle')}</p>
 
                 <label>
-                    Email
+                    {t('auth.email')}
                     <input
                         type="email"
                         value={email}
@@ -48,7 +50,7 @@ const Login = () => {
                 </label>
 
                 <label>
-                    Password
+                    {t('auth.password')}
                     <input
                         type="password"
                         value={password}
@@ -61,7 +63,7 @@ const Login = () => {
                 {error && <div className="error">{error}</div>}
 
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? 'Signing in…' : 'Sign in'}
+                    {submitting ? t('auth.signingIn') : t('auth.signIn')}
                 </button>
             </form>
 

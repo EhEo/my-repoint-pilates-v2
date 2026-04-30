@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import {
     fetchDashboardRevenue,
     type RevenueGranularity,
     type RevenueSeriesResponse,
 } from '../../utils/api';
 
-const GRANULARITIES: { value: RevenueGranularity; label: string }[] = [
-    { value: 'DAY', label: 'Day' },
-    { value: 'WEEK', label: 'Week' },
-    { value: 'MONTH', label: 'Month' },
-    { value: 'YEAR', label: 'Year' },
-];
+const GRANULARITIES: RevenueGranularity[] = ['DAY', 'WEEK', 'MONTH', 'YEAR'];
 
 // KRW 단위 축약: 100,000,000 → "1.2억", 10,000 → "1.2만"
 function formatKRWCompact(value: number): string {
@@ -29,6 +25,7 @@ function formatKRWFull(value: number): string {
 }
 
 const RevenueChart = () => {
+    const { t } = useTranslation();
     const [granularity, setGranularity] = useState<RevenueGranularity>('MONTH');
     const [data, setData] = useState<RevenueSeriesResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -58,16 +55,16 @@ const RevenueChart = () => {
     return (
         <div className="chart-container">
             <header className="chart-header">
-                <h3>Revenue</h3>
+                <h3>{t('charts.revenue')}</h3>
                 <div className="granularity-tabs">
                     {GRANULARITIES.map((g) => (
                         <button
-                            key={g.value}
+                            key={g}
                             type="button"
-                            className={clsx('granularity-tab', granularity === g.value && 'active')}
-                            onClick={() => setGranularity(g.value)}
+                            className={clsx('granularity-tab', granularity === g && 'active')}
+                            onClick={() => setGranularity(g)}
                         >
-                            {g.label}
+                            {t(`charts.granularity.${g}`)}
                         </button>
                     ))}
                 </div>
@@ -75,9 +72,9 @@ const RevenueChart = () => {
 
             <div className="chart-wrapper">
                 {isLoading ? (
-                    <div className="chart-empty">Loading…</div>
+                    <div className="chart-empty">{t('common.loading')}</div>
                 ) : !hasAny ? (
-                    <div className="chart-empty">결제 처리된 회원권이 없어 표시할 매출이 없습니다.</div>
+                    <div className="chart-empty">{t('charts.noPaidRevenue')}</div>
                 ) : (
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={series} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -115,12 +112,11 @@ const RevenueChart = () => {
                                 labelFormatter={(label) => `${label}`}
                                 formatter={(value, name) => {
                                     const key = String(name);
-                                    const labels: Record<string, string> = {
-                                        net: 'Net',
-                                        gross: 'Gross',
-                                        refunds: 'Refunds',
-                                    };
-                                    return [formatKRWFull(Number(value)), labels[key] ?? key];
+                                    const label =
+                                        key === 'net' || key === 'gross' || key === 'refunds'
+                                            ? t(`charts.labels.${key}`)
+                                            : key;
+                                    return [formatKRWFull(Number(value)), label];
                                 }}
                             />
                             <Area

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ClassCard from '../components/Classes/ClassCard';
 import ClassDetailModal from '../components/Classes/ClassDetailModal';
 import InstructorCard from '../components/Instructors/InstructorCard';
@@ -10,6 +11,7 @@ import type { ClassSession } from '../types';
 import clsx from 'clsx';
 
 const Classes = () => {
+    const { t, i18n } = useTranslation();
     const [activeTab, setActiveTab] = useState<'schedule' | 'instructors'>('schedule');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [selectedSession, setSelectedSession] = useState<ClassSession | null>(null);
@@ -81,7 +83,7 @@ const Classes = () => {
             await loadInstructors();
             setIsInstructorModalOpen(false);
         } catch (error) {
-            alert('Failed to register instructor');
+            alert(t('instructors.form.registerFailed'));
         }
     };
 
@@ -89,29 +91,31 @@ const Classes = () => {
         <div className="classes-page">
             <header className="page-header">
                 <div>
-                    <h1>Classes & Schedule</h1>
-                    <p className="text-muted">Manage the weekly schedule and instructor roster.</p>
+                    <h1>{t('classes.title')}</h1>
+                    <p className="text-muted">{t('classes.subtitle')}</p>
                 </div>
                 {activeTab === 'instructors' && (
-                    <button className="btn btn-primary" onClick={() => setIsInstructorModalOpen(true)}>
+                    <button type="button" className="btn btn-primary" onClick={() => setIsInstructorModalOpen(true)}>
                         <Plus size={20} style={{ marginRight: '8px' }} />
-                        Add Instructor
+                        {t('classes.addInstructor')}
                     </button>
                 )}
             </header>
 
             <div className="tabs">
                 <button
+                    type="button"
                     className={clsx('tab', activeTab === 'schedule' && 'active')}
                     onClick={() => setActiveTab('schedule')}
                 >
-                    Weekly Schedule
+                    {t('classes.tabs.schedule')}
                 </button>
                 <button
+                    type="button"
                     className={clsx('tab', activeTab === 'instructors' && 'active')}
                     onClick={() => setActiveTab('instructors')}
                 >
-                    Instructors
+                    {t('classes.tabs.instructors')}
                 </button>
             </div>
 
@@ -123,11 +127,12 @@ const Classes = () => {
                                 const d = new Date(date);
                                 return (
                                     <button
+                                        type="button"
                                         key={date}
                                         className={clsx('date-chip', selectedDate === date && 'active')}
                                         onClick={() => setSelectedDate(date)}
                                     >
-                                        <span className="day-name">{d.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                                        <span className="day-name">{d.toLocaleDateString(i18n.language, { weekday: 'short' })}</span>
                                         <span className="day-num">{d.getDate()}</span>
                                     </button>
                                 );
@@ -135,17 +140,18 @@ const Classes = () => {
                         </div>
 
                         <button
+                            type="button"
                             className="btn btn-secondary today-btn"
                             onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])}
                         >
                             <CalendarIcon size={16} style={{ marginRight: 6 }} />
-                            Today
+                            {t('common.today')}
                         </button>
                     </div>
 
                     <div className="classes-list">
                         {isLoading ? (
-                            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>Loading schedule...</div>
+                            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>{t('classes.loadingClasses')}</div>
                         ) : sortedClasses.length > 0 ? (
                             sortedClasses.map(session => (
                                 <ClassCard
@@ -156,8 +162,8 @@ const Classes = () => {
                             ))
                         ) : (
                             <div className="empty-state">
-                                <p>No classes scheduled for this day.</p>
-                                <button className="btn btn-primary mt-4">Schedule Class</button>
+                                <p>{t('classes.emptyDay')}</p>
+                                <button type="button" className="btn btn-primary mt-4">{t('classes.scheduleClass')}</button>
                             </div>
                         )}
                     </div>
@@ -168,7 +174,7 @@ const Classes = () => {
                 <div className="instructors-view">
                     <div className="instructors-grid">
                         {isLoading ? (
-                            <div>Loading instructors...</div>
+                            <div>{t('classes.loadingInstructors')}</div>
                         ) : instructors.map(instructor => (
                             <InstructorCard
                                 key={instructor.id}
@@ -190,7 +196,7 @@ const Classes = () => {
             <Modal
                 isOpen={isInstructorModalOpen}
                 onClose={() => setIsInstructorModalOpen(false)}
-                title="Register New Instructor"
+                title={t('classes.registerInstructorTitle')}
             >
                 <InstructorForm
                     onSubmit={handleRegisterInstructor}

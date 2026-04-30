@@ -1,0 +1,422 @@
+{
+    "common": {
+        "save": "저장",
+        "cancel": "취소",
+        "delete": "삭제",
+        "edit": "수정",
+        "add": "추가",
+        "close": "닫기",
+        "loading": "불러오는 중…",
+        "saving": "저장 중…",
+        "submitting": "처리 중…",
+        "search": "검색",
+        "yes": "예",
+        "no": "아니오",
+        "all": "전체",
+        "none": "없음",
+        "from": "시작",
+        "to": "종료",
+        "date": "날짜",
+        "time": "시간",
+        "type": "유형",
+        "status": "상태",
+        "actions": "작업",
+        "notes": "메모",
+        "today": "오늘"
+    },
+    "nav": {
+        "dashboard": "대시보드",
+        "members": "회원",
+        "assessments": "신체 평가",
+        "memberships": "회원권",
+        "classes": "수업·스케줄",
+        "schedules": "강사 스케줄",
+        "reservations": "예약",
+        "notifications": "알림",
+        "settings": "설정",
+        "signOut": "로그아웃",
+        "language": "언어"
+    },
+    "auth": {
+        "title": "Repoint Admin",
+        "subtitle": "관리자 계정으로 로그인하세요.",
+        "email": "이메일",
+        "password": "비밀번호",
+        "signIn": "로그인",
+        "signingIn": "로그인 중…",
+        "loginFailed": "로그인에 실패했습니다."
+    },
+    "dashboard": {
+        "title": "대시보드",
+        "subtitle": "오늘의 운영 현황을 확인하세요.",
+        "downloadReport": "리포트 다운로드",
+        "stats": {
+            "totalMembers": "전체 활성 회원",
+            "classesToday": "오늘 수업",
+            "revenue": "예상 매출",
+            "pendingRequests": "대기 중 요청"
+        },
+        "trends": {
+            "totalMembersChange": "지난달 대비 +12%",
+            "classesScheduled": "{{count}}개 예정",
+            "revenueNote": "활성 회원권 합계 기준 (mock)",
+            "pendingNeedAction": "{{count}}건 처리 필요",
+            "noPending": "처리할 항목 없음"
+        },
+        "recentActivity": "최근 활동",
+        "viewAll": "전체 보기",
+        "noActivity": "최근 활동이 없습니다.",
+        "loading": "대시보드를 불러오는 중…"
+    },
+    "charts": {
+        "revenue": "매출",
+        "weeklyAttendance": "수업 유형별 주간 출석",
+        "granularity": {
+            "DAY": "일",
+            "WEEK": "주",
+            "MONTH": "월",
+            "YEAR": "년"
+        },
+        "labels": {
+            "net": "순매출",
+            "gross": "총매출",
+            "refunds": "환불",
+            "weight": "체중 (kg)",
+            "bmi": "BMI",
+            "bodyFat": "체지방 (%)",
+            "group": "그룹",
+            "private": "개인"
+        },
+        "noPaidRevenue": "결제 처리된 회원권이 없어 표시할 매출이 없습니다."
+    },
+    "members": {
+        "title": "회원",
+        "subtitle": "회원 정보와 회원권을 관리합니다.",
+        "addMember": "회원 등록",
+        "registerNew": "신규 회원 등록",
+        "registerInstructorButton": "회원 등록",
+        "searchPlaceholder": "이름 또는 이메일로 검색…",
+        "filter": {
+            "allStatus": "전체 상태",
+            "active": "활성",
+            "inactive": "비활성",
+            "paused": "휴면"
+        },
+        "loading": "회원 목록을 불러오는 중…",
+        "empty": "회원이 없습니다.",
+        "card": {
+            "sessions": "잔여 세션",
+            "noActiveMembership": "활성 회원권 없음",
+            "expires": "만료일",
+            "lastVisit": "최근 방문",
+            "never": "방문 기록 없음",
+            "viewProfile": "프로필 보기",
+            "actions": "회원 메뉴"
+        },
+        "form": {
+            "name": "이름",
+            "namePlaceholder": "예: 홍길동",
+            "phone": "연락처",
+            "phonePlaceholder": "010-0000-0000",
+            "email": "이메일",
+            "emailPlaceholder": "name@example.com",
+            "status": "상태",
+            "notes": "메모",
+            "notesPlaceholder": "건강 상태, 특이사항 등...",
+            "membershipHint": "회원권(횟수권)은 회원 등록 후 별도의 회원권 페이지에서 발급합니다.",
+            "submit": "회원 등록",
+            "registerFailed": "회원 등록에 실패했습니다."
+        },
+        "status": {
+            "ACTIVE": "활성",
+            "INACTIVE": "비활성",
+            "PAUSED": "휴면"
+        }
+    },
+    "memberships": {
+        "title": "회원권",
+        "subtitle": "횟수권 발급·관리. 만료기간은 언제든 수정할 수 있습니다.",
+        "issueButton": "회원권 발급",
+        "issueModalTitle": "회원권 발급",
+        "issueHint": "기존 활성 회원권이 있으면 자동으로 취소되고 새 회원권이 발급됩니다.",
+        "tabs": {
+            "active": "활성",
+            "all": "전체"
+        },
+        "table": {
+            "member": "회원",
+            "remaining": "잔여",
+            "total": "총량",
+            "start": "시작일",
+            "expires": "만료일",
+            "status": "상태",
+            "payment": "결제",
+            "edit": "편집"
+        },
+        "form": {
+            "memberLabel": "회원 *",
+            "memberPlaceholder": "회원 선택…",
+            "totalCount": "총 세션 *",
+            "expiryDate": "만료일 *",
+            "issuing": "발급 중…",
+            "issue": "발급",
+            "issueFailed": "회원권 발급에 실패했습니다."
+        },
+        "edit": {
+            "title": "회원권 수정",
+            "intro": "{{name}} 회원의 회원권 정보를 수정합니다.",
+            "expiryLegend": "만료",
+            "expiryDate": "만료일",
+            "paymentLegend": "결제 (수기)",
+            "paymentHint": "결제 처리는 별도 결제 시스템 도입 전까지 수기로 표기합니다.",
+            "paid": "결제 완료",
+            "paidDate": "결제일",
+            "markPaidToday": "오늘 결제로 표시",
+            "refundLegend": "환불 (수기)",
+            "refundedDate": "환불일",
+            "refundHint": "환불 처리 시 회원권 상태(Status)도 별도로 CANCELLED 로 변경하거나 그대로 둘지 결정하세요.",
+            "markRefundedToday": "오늘 환불로 표시",
+            "noteLegend": "메모",
+            "noteLabel": "결제/환불 메모",
+            "notePlaceholder": "결제 수단, 환불 사유 등...",
+            "saveFailed": "수정에 실패했습니다."
+        },
+        "paymentBadge": {
+            "paid": "결제 완료",
+            "unpaid": "미결제",
+            "refunded": "환불 ({{date}})"
+        },
+        "status": {
+            "ACTIVE": "활성",
+            "EXPIRED": "만료",
+            "CANCELLED": "취소"
+        },
+        "loading": "회원권 목록을 불러오는 중…",
+        "empty": "회원권이 없습니다."
+    },
+    "assessments": {
+        "title": "신체 평가",
+        "subtitle": "회원별 신체 측정 기록과 추이. 최소 범위(키/체중/BMI/체지방/근육량)만 다루며 자세·유연성·운동 처방·사진은 미도입.",
+        "memberLabel": "회원",
+        "noMembers": "— 회원 없음 —",
+        "trend": {
+            "title": "추이",
+            "hint": "체중(kg) · BMI · 체지방률(%)",
+            "empty": "기록이 없거나 수치 데이터가 없습니다."
+        },
+        "add": {
+            "title": "측정 추가",
+            "hint": "BMI 는 키와 체중이 함께 입력되면 자동 계산됩니다.",
+            "date": "측정일",
+            "height": "키 (cm)",
+            "weight": "체중 (kg)",
+            "bodyFat": "체지방률 (%)",
+            "muscle": "근육량 (kg)",
+            "notes": "메모",
+            "notesPlaceholder": "특이사항, 통증 부위 등...",
+            "submit": "측정 추가",
+            "submitting": "저장 중…",
+            "createFailed": "측정 추가에 실패했습니다."
+        },
+        "history": {
+            "title": "기록",
+            "table": {
+                "date": "날짜",
+                "height": "키",
+                "weight": "체중",
+                "bmi": "BMI",
+                "bodyFat": "체지방",
+                "muscle": "근육량",
+                "notes": "메모"
+            },
+            "deleteConfirm": "이 측정 기록을 삭제하시겠습니까?",
+            "empty": "기록이 없습니다."
+        },
+        "loading": "기록을 불러오는 중…"
+    },
+    "schedules": {
+        "title": "강사 스케줄",
+        "subtitle": "강사별 주간 가용 시간과 휴무를 관리합니다.",
+        "instructorLabel": "강사",
+        "noInstructors": "— 강사 없음 —",
+        "weekly": {
+            "title": "주간 가용 시간",
+            "hint": "반복되는 주간 가용 시간대.",
+            "empty": "설정된 가용 시간이 없습니다.",
+            "table": {
+                "day": "요일",
+                "start": "시작",
+                "end": "종료"
+            },
+            "addFailed": "추가에 실패했습니다.",
+            "deleteConfirm": "이 시간대를 삭제하시겠습니까?",
+            "deleteAria": "시간대 삭제"
+        },
+        "leaves": {
+            "title": "휴무",
+            "hint": "특정 일자/기간 휴무 (주간 가용 시간을 override).",
+            "empty": "휴무 기록이 없습니다.",
+            "reasonPlaceholder": "사유 (선택)",
+            "table": {
+                "from": "시작일",
+                "to": "종료일",
+                "reason": "사유"
+            },
+            "addFailed": "휴무 추가에 실패했습니다.",
+            "deleteConfirm": "이 휴무를 삭제하시겠습니까?",
+            "deleteAria": "휴무 삭제"
+        },
+        "days": {
+            "0": "일",
+            "1": "월",
+            "2": "화",
+            "3": "수",
+            "4": "목",
+            "5": "금",
+            "6": "토"
+        },
+        "addButton": "추가",
+        "loading": "스케줄을 불러오는 중…"
+    },
+    "notifications": {
+        "title": "알림",
+        "subtitle": "예약 이벤트는 자동 발행. 회원권 만료 알림은 아래 버튼으로 수동 스캔 (스케줄러 도입 전 임시).",
+        "scanButton": "회원권 만료 스캔",
+        "scanning": "스캔 중…",
+        "scanResult": "{{count}}건의 만료 알림을 새로 발행했습니다.",
+        "scanFailed": "스캔에 실패했습니다.",
+        "tabs": {
+            "ALL": "전체",
+            "SENT": "발송",
+            "PENDING": "대기",
+            "FAILED": "실패"
+        },
+        "table": {
+            "created": "생성",
+            "type": "유형",
+            "recipient": "수신자",
+            "channel": "채널",
+            "status": "상태",
+            "title": "제목"
+        },
+        "type": {
+            "RESERVATION_CONFIRMED": "예약 확정",
+            "RESERVATION_CANCELLED": "예약 취소",
+            "MEMBERSHIP_EXPIRY": "회원권 만료"
+        },
+        "recipient": {
+            "MEMBER": "회원",
+            "INSTRUCTOR": "강사",
+            "ADMIN": "관리자"
+        },
+        "status": {
+            "PENDING": "대기",
+            "SENT": "발송",
+            "FAILED": "실패"
+        },
+        "deleteConfirm": "이 알림을 삭제하시겠습니까?",
+        "deleteAria": "알림 삭제",
+        "empty": "알림이 없습니다.",
+        "loading": "알림을 불러오는 중…"
+    },
+    "reservations": {
+        "title": "예약 내역",
+        "subtitle": "예약을 관리하고 출석 이력을 확인합니다.",
+        "tabs": {
+            "upcoming": "예정",
+            "history": "지난 내역"
+        },
+        "loading": "예약을 불러오는 중…",
+        "empty": "{{tab}} 예약이 없습니다.",
+        "cancelModal": {
+            "title": "예약 취소",
+            "confirmQuestion": "이 예약을 취소하시겠습니까?",
+            "warning": "취소 후 되돌릴 수 없습니다.",
+            "keep": "아니오, 유지",
+            "confirm": "예, 취소",
+            "success": "예약이 취소되었습니다.",
+            "failed": "예약 취소에 실패했습니다."
+        },
+        "card": {
+            "cancel": "취소",
+            "unknownInstructor": "강사 미지정"
+        },
+        "status": {
+            "CONFIRMED": "확정",
+            "WAITLIST": "대기",
+            "CANCELLED": "취소"
+        }
+    },
+    "classes": {
+        "title": "수업·스케줄",
+        "subtitle": "주간 일정과 강사진을 관리합니다.",
+        "tabs": {
+            "schedule": "주간 일정",
+            "instructors": "강사진"
+        },
+        "addInstructor": "강사 등록",
+        "registerInstructorTitle": "신규 강사 등록",
+        "loadingClasses": "일정을 불러오는 중…",
+        "loadingInstructors": "강사 목록을 불러오는 중…",
+        "emptyDay": "이 날짜에 예정된 수업이 없습니다.",
+        "scheduleClass": "수업 예약",
+        "card": {
+            "duration": "{{count}}분",
+            "detail": "상세",
+            "level": {
+                "beginner": "초급",
+                "intermediate": "중급",
+                "advanced": "고급",
+                "all": "전체"
+            }
+        },
+        "detail": {
+            "title": "수업 상세",
+            "private": "1:1 개인 수업",
+            "group": "그룹 수업",
+            "fields": {
+                "date": "날짜",
+                "time": "시간",
+                "instructor": "강사",
+                "room": "룸"
+            },
+            "attendees": "참가자 ({{enrolled}}/{{capacity}})",
+            "addMember": "회원 추가",
+            "noAttendees": "아직 등록된 회원이 없습니다.",
+            "memberLabel": "회원 {{n}}",
+            "removeAria": "참가자 제거",
+            "cancelClass": "수업 취소",
+            "close": "닫기"
+        }
+    },
+    "instructors": {
+        "card": {
+            "edit": "수정",
+            "schedule": "스케줄"
+        },
+        "form": {
+            "name": "이름 *",
+            "namePlaceholder": "예: 홍길동",
+            "email": "이메일 *",
+            "emailPlaceholder": "name@example.com",
+            "specialties": "전문 분야 (쉼표로 구분)",
+            "specialtiesPlaceholder": "예: 리포머, 캐딜락, 재활",
+            "status": "상태",
+            "submit": "강사 등록",
+            "registerFailed": "강사 등록에 실패했습니다."
+        },
+        "status": {
+            "active": "활성",
+            "inactive": "비활성",
+            "leave": "휴직"
+        }
+    },
+    "modal": {
+        "close": "모달 닫기"
+    },
+    "header": {
+        "searchPlaceholder": "회원, 수업 검색...",
+        "notifications": "알림",
+        "signOut": "로그아웃"
+    }
+}

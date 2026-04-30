@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Instructor } from '../../types';
 
 interface InstructorCardProps {
@@ -8,6 +9,8 @@ interface InstructorCardProps {
 }
 
 const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onEdit, onSchedule }) => {
+    const { t } = useTranslation();
+    const statusKey = String(instructor.status).toLowerCase() as 'active' | 'inactive' | 'leave';
     return (
         <div className="card instructor-card">
             <div className="instructor-header">
@@ -16,7 +19,9 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onEdit, onS
                     <h3>{instructor.name}</h3>
                     <p className="text-muted text-sm">{instructor.email}</p>
                 </div>
-                <span className={`status-badge ${instructor.status}`}>{instructor.status}</span>
+                <span className={`status-badge ${instructor.status}`}>
+                    {t(`instructors.status.${statusKey}` as 'instructors.status.active', { defaultValue: instructor.status })}
+                </span>
             </div>
             <div className="instructor-specialties">
                 {instructor.specialties.map(s => (
@@ -25,16 +30,18 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onEdit, onS
             </div>
             <div className="card-actions">
                 <button
+                    type="button"
                     className="btn btn-sm btn-outline"
                     onClick={() => onEdit?.(instructor.id)}
                 >
-                    Edit
+                    {t('instructors.card.edit')}
                 </button>
                 <button
+                    type="button"
                     className="btn btn-sm btn-outline"
                     onClick={() => onSchedule?.(instructor.id)}
                 >
-                    Schedule
+                    {t('instructors.card.schedule')}
                 </button>
             </div>
 

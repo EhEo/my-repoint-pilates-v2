@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+    const { t } = useTranslation();
     const modalRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -40,7 +42,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
             <div className="modal-container" ref={modalRef} role="dialog" aria-modal="true">
                 <div className="modal-header">
                     <h3>{title}</h3>
-                    <button className="close-btn" onClick={onClose} aria-label="Close modal">
+                    <button type="button" className="close-btn" onClick={onClose} aria-label={t('modal.close')}>
                         <X size={20} />
                     </button>
                 </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     fetchNotifications,
     scanMembershipExpiries,
@@ -8,20 +9,10 @@ import {
 } from '../utils/api';
 import type { Notification, NotificationStatus } from '../types';
 
-const STATUS_FILTERS: { value: NotificationStatus | 'ALL'; label: string }[] = [
-    { value: 'ALL', label: 'All' },
-    { value: 'SENT', label: 'Sent' },
-    { value: 'PENDING', label: 'Pending' },
-    { value: 'FAILED', label: 'Failed' },
-];
-
-const TYPE_LABEL: Record<Notification['type'], string> = {
-    RESERVATION_CONFIRMED: '예약 확정',
-    RESERVATION_CANCELLED: '예약 취소',
-    MEMBERSHIP_EXPIRY: '회원권 만료',
-};
+const STATUS_FILTERS: (NotificationStatus | 'ALL')[] = ['ALL', 'SENT', 'PENDING', 'FAILED'];
 
 const Notifications = () => {
+    const { t } = useTranslation();
     const [items, setItems] = useState<Notification[]>([]);
     const [filter, setFilter] = useState<NotificationStatus | 'ALL'>('ALL');
     const [isLoading, setIsLoading] = useState(true);
@@ -52,17 +43,17 @@ const Notifications = () => {
         setScanResult(null);
         try {
             const result = await scanMembershipExpiries();
-            setScanResult(`${result.created} 건의 만료 알림을 새로 발행했습니다.`);
+            setScanResult(t('notifications.scanResult', { count: result.created }));
             await load();
         } catch (err) {
-            setScanResult(err instanceof Error ? err.message : 'Scan failed');
+            setScanResult(err instanceof Error ? err.message : t('notifications.scanFailed'));
         } finally {
             setScanning(false);
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Delete this notification?')) return;
+        if (!confirm(t('notifications.deleteConfirm'))) return;
         await deleteNotification(id);
         await load();
     };
@@ -71,13 +62,11 @@ const Notifications = () => {
         <div className="notifications-page">
             <header className="page-header">
                 <div>
-                    <h1>Notifications</h1>
-                    <p className="text-muted">
-                        예약 이벤트는 자동 발행. 회원권 만료 알림은 아래 버튼으로 수동 스캔 (스케줄러 도입 전 임시).
-                    </p>
+                    <h1>{t('notifications.title')}</h1>
+                    <p className="text-muted">{t('notifications.subtitle')}</p>
                 </div>
                 <button type="button" className="btn btn-primary" onClick={handleScan} disabled={scanning}>
-                    {scanning ? 'Scanning…' : 'Scan membership expiries'}
+                    {scanning ? t('notifications.scanning') : t('notifications.scanButton')}
                 </button>
             </header>
 
@@ -86,31 +75,31 @@ const Notifications = () => {
             <div className="tabs">
                 {STATUS_FILTERS.map((s) => (
                     <button
-                        key={s.value}
+                        key={s}
                         type="button"
-                        className={clsx('tab', filter === s.value && 'active')}
-                        onClick={() => setFilter(s.value)}
+                        className={clsx('tab', filter === s && 'active')}
+                        onClick={() => setFilter(s)}
                     >
-                        {s.label}
+                        {t(`notifications.tabs.${s}` as 'notifications.tabs.ALL')}
                     </button>
                 ))}
             </div>
 
             {isLoading ? (
-                <div className="empty">Loading…</div>
+                <div className="empty">{t('notifications.loading')}</div>
             ) : items.length === 0 ? (
-                <div className="empty">No notifications.</div>
+                <div className="empty">{t('notifications.empty')}</div>
             ) : (
                 <div className="card table-card">
                     <table>
                         <thead>
                             <tr>
-                                <th>Created</th>
-                                <th>Type</th>
-                                <th>Recipient</th>
-                                <th>Channel</th>
-                                <th>Status</th>
-                                <th>Title</th>
+                                <th>{t('notifications.table.created')}</th>
+                                <th>{t('notifications.table.type')}</th>
+                                <th>{t('notifications.table.recipient')}</th>
+                                <th>{t('notifications.table.channel')}</th>
+                                <th>{t('notifications.table.status')}</th>
+                                <th>{t('notifications.table.title')}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -118,22 +107,24 @@ const Notifications = () => {
                             {items.map((n) => (
                                 <tr key={n.id}>
                                     <td className="ts">
-                                        {new Date(n.createdAt).toLocaleString('ko-KR', {
+                                        {new Date(n.createdAt).toLocaleString(undefined, {
                                             month: '2-digit',
                                             day: '2-digit',
                                             hour: '2-digit',
                                             minute: '2-digit',
                                         })}
                                     </td>
-                                    <td>{TYPE_LABEL[n.type] ?? n.type}</td>
+                                    <td>{t(`notifications.type.${n.type}` as 'notifications.type.RESERVATION_CONFIRMED', { defaultValue: n.type })}</td>
                                     <td>
-                                        <span className="text-muted">{n.recipientType.toLowerCase()}</span>{' '}
+                                        <span className="text-muted">
+                                            {t(`notifications.recipient.${n.recipientType}` as 'notifications.recipient.MEMBER', { defaultValue: n.recipientType })}
+                                        </span>{' '}
                                         <span className="mono">{n.recipientId.slice(0, 8)}</span>
                                     </td>
                                     <td>{n.channel}</td>
                                     <td>
                                         <span className={clsx('status-badge', n.status.toLowerCase())}>
-                                            {n.status}
+                                            {t(`notifications.status.${n.status}` as 'notifications.status.SENT', { defaultValue: n.status })}
                                         </span>
                                     </td>
                                     <td>
@@ -145,7 +136,7 @@ const Notifications = () => {
                                         <button
                                             type="button"
                                             className="icon-btn"
-                                            aria-label="Delete notification"
+                                            aria-label={t('notifications.deleteAria')}
                                             onClick={() => handleDelete(n.id)}
                                         >
                                             <Trash2 size={16} />

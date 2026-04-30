@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     fetchInstructors,
     fetchInstructorSchedules,
@@ -11,9 +12,9 @@ import {
 } from '../utils/api';
 import type { Instructor, InstructorSchedule, InstructorLeave } from '../types';
 
-const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
 const Schedules = () => {
+    const { t } = useTranslation();
+    const DAY_KEYS = ['0', '1', '2', '3', '4', '5', '6'] as const;
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [selectedId, setSelectedId] = useState<string>('');
     const [schedules, setSchedules] = useState<InstructorSchedule[]>([]);
@@ -79,12 +80,12 @@ const Schedules = () => {
             });
             await loadForInstructor(selectedId);
         } catch (err) {
-            setScheduleError(err instanceof Error ? err.message : 'Failed to add slot');
+            setScheduleError(err instanceof Error ? err.message : t('schedules.weekly.addFailed'));
         }
     };
 
     const handleDeleteSchedule = async (id: string) => {
-        if (!confirm('Delete this slot?')) return;
+        if (!confirm(t('schedules.weekly.deleteConfirm'))) return;
         await deleteInstructorSchedule(id);
         if (selectedId) await loadForInstructor(selectedId);
     };
@@ -103,12 +104,12 @@ const Schedules = () => {
             setLeaveReason('');
             await loadForInstructor(selectedId);
         } catch (err) {
-            setLeaveError(err instanceof Error ? err.message : 'Failed to add leave');
+            setLeaveError(err instanceof Error ? err.message : t('schedules.leaves.addFailed'));
         }
     };
 
     const handleDeleteLeave = async (id: string) => {
-        if (!confirm('Delete this leave?')) return;
+        if (!confirm(t('schedules.leaves.deleteConfirm'))) return;
         await deleteInstructorLeave(id);
         if (selectedId) await loadForInstructor(selectedId);
     };
@@ -117,19 +118,19 @@ const Schedules = () => {
         <div className="schedules-page">
             <header className="page-header">
                 <div>
-                    <h1>Instructor Schedules</h1>
-                    <p className="text-muted">강사별 주간 가용 시간과 휴무를 관리합니다.</p>
+                    <h1>{t('schedules.title')}</h1>
+                    <p className="text-muted">{t('schedules.subtitle')}</p>
                 </div>
             </header>
 
             <div className="instructor-picker">
-                <label htmlFor="instructor">Instructor</label>
+                <label htmlFor="instructor">{t('schedules.instructorLabel')}</label>
                 <select
                     id="instructor"
                     value={selectedId}
                     onChange={(e) => setSelectedId(e.target.value)}
                 >
-                    {instructors.length === 0 && <option value="">— No instructors —</option>}
+                    {instructors.length === 0 && <option value="">{t('schedules.noInstructors')}</option>}
                     {instructors.map((i) => (
                         <option key={i.id} value={i.id}>
                             {i.name}
@@ -139,36 +140,36 @@ const Schedules = () => {
             </div>
 
             {isLoading ? (
-                <div className="loading">Loading…</div>
+                <div className="loading">{t('schedules.loading')}</div>
             ) : (
                 <div className="grid">
                     <section className="card panel">
-                        <h2>Weekly Availability</h2>
-                        <p className="text-muted hint">반복되는 주간 가용 시간대.</p>
+                        <h2>{t('schedules.weekly.title')}</h2>
+                        <p className="text-muted hint">{t('schedules.weekly.hint')}</p>
 
                         {schedules.length === 0 ? (
-                            <p className="empty">No availability set.</p>
+                            <p className="empty">{t('schedules.weekly.empty')}</p>
                         ) : (
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Day</th>
-                                        <th>Start</th>
-                                        <th>End</th>
+                                        <th>{t('schedules.weekly.table.day')}</th>
+                                        <th>{t('schedules.weekly.table.start')}</th>
+                                        <th>{t('schedules.weekly.table.end')}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {schedules.map((s) => (
                                         <tr key={s.id}>
-                                            <td>{DAY_LABELS[s.dayOfWeek]}</td>
+                                            <td>{t(`schedules.days.${DAY_KEYS[s.dayOfWeek]}` as 'schedules.days.0')}</td>
                                             <td>{s.startTime}</td>
                                             <td>{s.endTime}</td>
                                             <td>
                                                 <button
                                                     type="button"
                                                     className="icon-btn"
-                                                    aria-label="Delete slot"
+                                                    aria-label={t('schedules.weekly.deleteAria')}
                                                     onClick={() => handleDeleteSchedule(s.id)}
                                                 >
                                                     <Trash2 size={16} />
@@ -184,11 +185,11 @@ const Schedules = () => {
                             <select
                                 value={newDayOfWeek}
                                 onChange={(e) => setNewDayOfWeek(Number(e.target.value))}
-                                aria-label="Day of week"
+                                aria-label={t('schedules.weekly.table.day')}
                             >
-                                {DAY_LABELS.map((label, i) => (
+                                {DAY_KEYS.map((k, i) => (
                                     <option key={i} value={i}>
-                                        {label}
+                                        {t(`schedules.days.${k}` as 'schedules.days.0')}
                                     </option>
                                 ))}
                             </select>
@@ -196,34 +197,34 @@ const Schedules = () => {
                                 type="time"
                                 value={newStartTime}
                                 onChange={(e) => setNewStartTime(e.target.value)}
-                                aria-label="Start time"
+                                aria-label={t('schedules.weekly.table.start')}
                             />
                             <input
                                 type="time"
                                 value={newEndTime}
                                 onChange={(e) => setNewEndTime(e.target.value)}
-                                aria-label="End time"
+                                aria-label={t('schedules.weekly.table.end')}
                             />
                             <button type="submit" className="btn btn-primary" disabled={!selectedId}>
-                                Add
+                                {t('schedules.addButton')}
                             </button>
                         </form>
                         {scheduleError && <div className="error">{scheduleError}</div>}
                     </section>
 
                     <section className="card panel">
-                        <h2>Leaves</h2>
-                        <p className="text-muted hint">특정 일자/기간 휴무 (주간 가용 시간을 override).</p>
+                        <h2>{t('schedules.leaves.title')}</h2>
+                        <p className="text-muted hint">{t('schedules.leaves.hint')}</p>
 
                         {leaves.length === 0 ? (
-                            <p className="empty">No leaves.</p>
+                            <p className="empty">{t('schedules.leaves.empty')}</p>
                         ) : (
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Reason</th>
+                                        <th>{t('schedules.leaves.table.from')}</th>
+                                        <th>{t('schedules.leaves.table.to')}</th>
+                                        <th>{t('schedules.leaves.table.reason')}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -237,7 +238,7 @@ const Schedules = () => {
                                                 <button
                                                     type="button"
                                                     className="icon-btn"
-                                                    aria-label="Delete leave"
+                                                    aria-label={t('schedules.leaves.deleteAria')}
                                                     onClick={() => handleDeleteLeave(l.id)}
                                                 >
                                                     <Trash2 size={16} />
@@ -254,23 +255,23 @@ const Schedules = () => {
                                 type="date"
                                 value={leaveStart}
                                 onChange={(e) => setLeaveStart(e.target.value)}
-                                aria-label="Leave start date"
+                                aria-label={t('schedules.leaves.table.from')}
                             />
                             <input
                                 type="date"
                                 value={leaveEnd}
                                 onChange={(e) => setLeaveEnd(e.target.value)}
-                                aria-label="Leave end date"
+                                aria-label={t('schedules.leaves.table.to')}
                             />
                             <input
                                 type="text"
                                 value={leaveReason}
                                 onChange={(e) => setLeaveReason(e.target.value)}
-                                placeholder="Reason (optional)"
-                                aria-label="Leave reason"
+                                placeholder={t('schedules.leaves.reasonPlaceholder')}
+                                aria-label={t('schedules.leaves.table.reason')}
                             />
                             <button type="submit" className="btn btn-primary" disabled={!selectedId}>
-                                Add
+                                {t('schedules.addButton')}
                             </button>
                         </form>
                         {leaveError && <div className="error">{leaveError}</div>}

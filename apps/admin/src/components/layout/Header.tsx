@@ -1,9 +1,12 @@
 import { Bell, LogOut, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { clearSession, getUser } from '../../utils/auth';
+import LanguageToggle from './LanguageToggle';
 
 const Header = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const user = getUser();
 
     const handleLogout = () => {
@@ -15,16 +18,17 @@ const Header = () => {
         <header className="header">
             <div className="header-search">
                 <Search size={20} className="text-muted" />
-                <input type="text" placeholder="Search members, classes..." className="search-input" />
+                <input type="text" placeholder={t('header.searchPlaceholder')} className="search-input" />
             </div>
 
             <div className="header-actions">
                 {user && <span className="user-email">{user.email}</span>}
-                <button type="button" className="icon-btn" aria-label="Notifications">
+                <LanguageToggle />
+                <button type="button" className="icon-btn" aria-label={t('header.notifications')}>
                     <Bell size={20} />
                     <span className="badge">2</span>
                 </button>
-                <button type="button" className="icon-btn" aria-label="Sign out" onClick={handleLogout}>
+                <button type="button" className="icon-btn" aria-label={t('header.signOut')} onClick={handleLogout}>
                     <LogOut size={20} />
                 </button>
             </div>
