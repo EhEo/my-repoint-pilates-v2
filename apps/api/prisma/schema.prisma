@@ -90,6 +90,14 @@ model Membership {
   endDate        DateTime
   status         MembershipStatus @default(ACTIVE)
 
+  // Phase 4 (mini) — payment is tracked as flags only for now. A proper
+  // Payment table is deferred. Admin toggles these manually when cash/card
+  // is collected or a refund is processed.
+  paid        Boolean   @default(false)
+  paidAt      DateTime?
+  refundedAt  DateTime?
+  paymentNote String? // free-text memo: 결제 수단, 환불 사유 등
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

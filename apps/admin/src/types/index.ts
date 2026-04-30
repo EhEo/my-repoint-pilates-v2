@@ -27,6 +27,11 @@ export interface Membership {
     startDate: string;
     endDate: string;
     status: MembershipStatus;
+    // Phase 4 (mini) — flag-only payment tracking, manually toggled by admin
+    paid: boolean;
+    paidAt?: string | null;
+    refundedAt?: string | null;
+    paymentNote?: string | null;
     createdAt: string;
     updatedAt: string;
 }

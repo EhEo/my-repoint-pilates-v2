@@ -139,13 +139,22 @@
 - [x] mockData.ts 는 무효화돼 빈 stub 으로 비워둠 (Phase 6 에서 일괄 제거)
 - [x] 검증: `npm run build:admin && npm run build:api` 모두 exit 0
 
-### Integration Phase 4 — 결제 모델 (PRD 3.6)
-- 신규 모델 `Payment { id memberId membershipId? method amount status installments? receiptNo paidAt refundedAt }`
-- enum `PaymentMethod { CASH CARD TRANSFER EASYPAY }`
-- enum `PaymentStatus { PAID PARTIAL_REFUND REFUNDED CANCELLED }`
-- 회원권 등록 시 결제 레코드 동시 생성
-- 환불 워크플로우 (전액/부분)
-- 어드민 SPA에 결제 페이지
+### ✅ Integration Phase 4 (mini) — 결제 플래그만 도입 — 완료
+
+사용자 결정 반영: 본격 Payment 모델은 나중에. 현재는 **수기 표기** 가능한 플래그만 추가하고, 할부(installments)는 도입하지 않음.
+
+- [x] [Membership](../apps/api/prisma/schema.prisma) 에 `paid`, `paidAt`, `refundedAt`, `paymentNote` 컬럼 추가 (모두 nullable/default false)
+- [x] PATCH /api/memberships 가 위 4개 컬럼을 수기로 갱신 허용
+- [x] [Memberships](../apps/admin/src/pages/Memberships.tsx) 페이지: 테이블에 Payment 컬럼(Paid/Unpaid/Refunded 배지) 추가, 편집 모달에 결제·환불 fieldset + "Mark paid/refunded today" 버튼 + 자유 텍스트 메모
+- [x] 환불 시 회원권 status 자동 변경은 하지 않음 — admin 이 별도로 CANCELLED 로 토글 (정책상 명시적 결정이 안전)
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
+
+**미도입 (Phase 4+ 또는 별도 단계로 미룸)**:
+
+- 별도 `Payment` 테이블 / `PaymentMethod` / `PaymentStatus` enum
+- 결제 수단별 처리, 영수증 발행
+- 부분 환불 (현재는 환불 여부만 boolean-ish — refundedAt 의 존재 여부)
+- 할부 (사용자 요청으로 취소)
 
 ### Integration Phase 5 — 부가 기능 (선택, PRD 기반)
 - **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
@@ -174,6 +183,6 @@
 | Integration Phase 1.5 — 기존 빌드 에러 정리 | ✅ 완료 | admin/api 빌드 green |
 | Integration Phase 2 — JWT 인증 도입 | ✅ 완료 | bcrypt + jsonwebtoken, /api/* 전부 ADMIN-only, /login 페이지 |
 | Integration Phase 3 — Membership 테이블 분리 | ✅ 완료 | 횟수권 단일활성, endDate 수정 가능, 예약 트랜잭션화 |
-| Integration Phase 4 — Payment 모델 | ⬜ 예정 | PRD 3.6 |
+| Integration Phase 4 (mini) — 결제 플래그 | ✅ 완료 | Membership 에 paid/paidAt/refundedAt/paymentNote 수기 토글. 본격 Payment 모델은 보류 |
 | Integration Phase 5 — 부가 기능 | ⬜ 예정 | 신체평가/강사스케줄/알림/대시보드 확장 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

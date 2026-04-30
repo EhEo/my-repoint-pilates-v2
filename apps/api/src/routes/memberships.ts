@@ -69,16 +69,31 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Editable: endDate, totalCount, remainingCount, status (per Phase 3 user req)
+// Editable fields (manual, by admin):
+//   endDate, totalCount, remainingCount, status (Phase 3)
+//   paid, paidAt, refundedAt, paymentNote (Phase 4 mini — flag-only payment)
 router.patch('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { endDate, totalCount, remainingCount, status } = req.body;
+        const {
+            endDate,
+            totalCount,
+            remainingCount,
+            status,
+            paid,
+            paidAt,
+            refundedAt,
+            paymentNote,
+        } = req.body;
         const data: Record<string, unknown> = {};
         if (endDate !== undefined) data.endDate = new Date(endDate);
         if (typeof totalCount === 'number') data.totalCount = totalCount;
         if (typeof remainingCount === 'number') data.remainingCount = remainingCount;
         if (status !== undefined) data.status = status;
+        if (typeof paid === 'boolean') data.paid = paid;
+        if (paidAt !== undefined) data.paidAt = paidAt ? new Date(paidAt) : null;
+        if (refundedAt !== undefined) data.refundedAt = refundedAt ? new Date(refundedAt) : null;
+        if (paymentNote !== undefined) data.paymentNote = paymentNote || null;
 
         const updated = await prisma.membership.update({
             where: { id },

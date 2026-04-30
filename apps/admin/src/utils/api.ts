@@ -89,7 +89,16 @@ export const createMembership = (data: {
 }) => request<any>('/api/memberships', { method: 'POST', body: data });
 export const updateMembership = (
     id: string,
-    data: { endDate?: string; totalCount?: number; remainingCount?: number; status?: string }
+    data: {
+        endDate?: string;
+        totalCount?: number;
+        remainingCount?: number;
+        status?: string;
+        paid?: boolean;
+        paidAt?: string | null;
+        refundedAt?: string | null;
+        paymentNote?: string | null;
+    }
 ) => request<any>(`/api/memberships/${id}`, { method: 'PATCH', body: data });
 export const deleteMembership = (id: string) =>
     request<any>(`/api/memberships/${id}`, { method: 'DELETE' });

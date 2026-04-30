@@ -29,9 +29,13 @@ const Memberships = () => {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Edit (endDate) modal
+    // Edit modal — endDate + payment/refund flags (Phase 4 mini)
     const [editing, setEditing] = useState<Membership | null>(null);
     const [editEndDate, setEditEndDate] = useState('');
+    const [editPaid, setEditPaid] = useState(false);
+    const [editPaidAt, setEditPaidAt] = useState('');
+    const [editRefundedAt, setEditRefundedAt] = useState('');
+    const [editNote, setEditNote] = useState('');
 
     const load = async () => {
         setIsLoading(true);
@@ -75,21 +79,42 @@ const Memberships = () => {
         }
     };
 
-    const handleSaveEndDate = async () => {
+    const handleSaveEdit = async () => {
         if (!editing) return;
         try {
-            await updateMembership(editing.id, { endDate: editEndDate });
+            await updateMembership(editing.id, {
+                endDate: editEndDate,
+                paid: editPaid,
+                paidAt: editPaidAt ? new Date(editPaidAt).toISOString() : null,
+                refundedAt: editRefundedAt ? new Date(editRefundedAt).toISOString() : null,
+                paymentNote: editNote.trim() ? editNote.trim() : null,
+            });
             setEditing(null);
             await load();
         } catch (err) {
             console.error(err);
-            alert('Failed to update expiry');
+            alert('Failed to update membership');
         }
     };
 
     const startEdit = (m: Membership) => {
         setEditing(m);
         setEditEndDate(toDateInput(m.endDate));
+        setEditPaid(m.paid);
+        setEditPaidAt(m.paidAt ? toDateInput(m.paidAt) : '');
+        setEditRefundedAt(m.refundedAt ? toDateInput(m.refundedAt) : '');
+        setEditNote(m.paymentNote ?? '');
+    };
+
+    const markRefundedNow = () => {
+        const today = new Date().toISOString().slice(0, 10);
+        setEditRefundedAt(today);
+    };
+
+    const markPaidNow = () => {
+        const today = new Date().toISOString().slice(0, 10);
+        setEditPaid(true);
+        setEditPaidAt(today);
     };
 
     return (
@@ -136,6 +161,7 @@ const Memberships = () => {
                                 <th>Start</th>
                                 <th>Expires</th>
                                 <th>Status</th>
+                                <th>Payment</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -153,8 +179,19 @@ const Memberships = () => {
                                         </span>
                                     </td>
                                     <td>
+                                        {m.refundedAt ? (
+                                            <span className="status-badge refunded">
+                                                Refunded {new Date(m.refundedAt).toLocaleDateString()}
+                                            </span>
+                                        ) : m.paid ? (
+                                            <span className="status-badge paid">Paid</span>
+                                        ) : (
+                                            <span className="status-badge unpaid">Unpaid</span>
+                                        )}
+                                    </td>
+                                    <td>
                                         <button type="button" className="btn btn-secondary btn-sm" onClick={() => startEdit(m)}>
-                                            Edit Expiry
+                                            Edit
                                         </button>
                                     </td>
                                 </tr>
@@ -220,26 +257,96 @@ const Memberships = () => {
                 </form>
             </Modal>
 
-            <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Edit Expiry">
+            <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Edit Membership">
                 {editing && (
                     <div className="edit-form">
                         <p>
-                            <strong>{editing.member?.name}</strong> 의 회원권 만료일을 수정합니다.
+                            <strong>{editing.member?.name}</strong> 의 회원권 정보를 수정합니다.
                         </p>
-                        <div className="form-group">
-                            <label htmlFor="editEndDate">Expiry Date</label>
-                            <input
-                                id="editEndDate"
-                                type="date"
-                                value={editEndDate}
-                                onChange={(e) => setEditEndDate(e.target.value)}
-                            />
-                        </div>
+
+                        <fieldset>
+                            <legend>Expiry</legend>
+                            <div className="form-group">
+                                <label htmlFor="editEndDate">Expiry Date</label>
+                                <input
+                                    id="editEndDate"
+                                    type="date"
+                                    value={editEndDate}
+                                    onChange={(e) => setEditEndDate(e.target.value)}
+                                />
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Payment (수기)</legend>
+                            <p className="hint text-muted">
+                                결제 처리는 별도 결제 시스템 도입 전까지 수기로 표기합니다.
+                            </p>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={editPaid}
+                                            onChange={(e) => setEditPaid(e.target.checked)}
+                                        />
+                                        Paid
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="editPaidAt">Paid Date</label>
+                                    <input
+                                        id="editPaidAt"
+                                        type="date"
+                                        value={editPaidAt}
+                                        onChange={(e) => setEditPaidAt(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <button type="button" className="btn btn-secondary btn-sm" onClick={markPaidNow}>
+                                Mark paid today
+                            </button>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Refund (수기)</legend>
+                            <div className="form-group">
+                                <label htmlFor="editRefundedAt">Refunded Date</label>
+                                <input
+                                    id="editRefundedAt"
+                                    type="date"
+                                    value={editRefundedAt}
+                                    onChange={(e) => setEditRefundedAt(e.target.value)}
+                                />
+                                <p className="hint text-muted">
+                                    환불 처리 시 회원권 상태(Status)도 별도로 CANCELLED 로 변경하거나
+                                    그대로 둘지 결정하세요.
+                                </p>
+                            </div>
+                            <button type="button" className="btn btn-secondary btn-sm" onClick={markRefundedNow}>
+                                Mark refunded today
+                            </button>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Note</legend>
+                            <div className="form-group">
+                                <label htmlFor="editNote">결제/환불 메모</label>
+                                <textarea
+                                    id="editNote"
+                                    rows={3}
+                                    value={editNote}
+                                    onChange={(e) => setEditNote(e.target.value)}
+                                    placeholder="결제 수단, 환불 사유 등..."
+                                />
+                            </div>
+                        </fieldset>
+
                         <div className="form-actions">
                             <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
                                 Cancel
                             </button>
-                            <button type="button" className="btn btn-primary" onClick={handleSaveEndDate}>
+                            <button type="button" className="btn btn-primary" onClick={handleSaveEdit}>
                                 Save
                             </button>
                         </div>
@@ -302,9 +409,49 @@ const Memberships = () => {
                     color: hsl(var(--color-success));
                 }
                 .status-badge.expired,
-                .status-badge.cancelled {
+                .status-badge.cancelled,
+                .status-badge.unpaid {
                     background-color: hsl(var(--color-text-muted) / 0.1);
                     color: hsl(var(--color-text-muted));
+                }
+                .status-badge.paid {
+                    background-color: hsl(var(--color-success) / 0.1);
+                    color: hsl(var(--color-success));
+                }
+                .status-badge.refunded {
+                    background-color: hsl(var(--color-warning) / 0.1);
+                    color: hsl(var(--color-warning));
+                }
+                fieldset {
+                    border: 1px solid hsl(var(--color-border));
+                    border-radius: var(--radius-md);
+                    padding: var(--space-4);
+                    display: flex;
+                    flex-direction: column;
+                    gap: var(--space-3);
+                }
+                fieldset legend {
+                    font-size: 0.85rem;
+                    color: hsl(var(--color-text-muted));
+                    padding: 0 var(--space-2);
+                }
+                .checkbox-label {
+                    display: flex;
+                    align-items: center;
+                    gap: var(--space-2);
+                    color: hsl(var(--color-text-main));
+                }
+                .checkbox-label input[type="checkbox"] {
+                    width: 18px;
+                    height: 18px;
+                }
+                .form-group textarea {
+                    padding: var(--space-3);
+                    border: 1px solid hsl(var(--color-border));
+                    border-radius: var(--radius-md);
+                    font-size: 0.95rem;
+                    font-family: inherit;
+                    resize: vertical;
                 }
                 .empty-state, .loading {
                     text-align: center;
