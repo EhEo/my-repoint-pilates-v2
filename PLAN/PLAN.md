@@ -122,14 +122,22 @@
 - [x] Dockerfile CMD에 `npm run prisma:seed` 추가, docker-compose `api` 서비스에 `env_file` 연결
 - [x] 검증: `npm run build:admin && npm run build:api` 모두 exit 0
 
-### Integration Phase 3 — Prisma 스키마: 회원권 분리 (PRD 3.2)
-- 기존 `Member.remainingSessions/totalSessions/membershipType` 컬럼은 제거
-- 신규 모델 `Membership { id memberId type totalCount? remainingCount? startDate endDate? status holdStartAt? holdEndAt? }`
-- enum `MembershipType { COUNT PERIOD MIXED }` (PRD 3.2.1)
-- enum `MembershipStatus { ACTIVE EXPIRED HOLD CANCELLED }`
-- 예약 생성/취소 트랜잭션 ([server/src/routes/reservations.ts](../server/src/routes/reservations.ts))을 `prisma.$transaction`으로 감싸 회원의 **현재 활성 회원권** 잔여 횟수를 갱신
-- 회원권 만료 임박/홀딩/연장 엔드포인트
-- 어드민 SPA에 회원권 페이지
+### ✅ Integration Phase 3 — 회원권 분리 (PRD 3.2) — 완료
+
+사용자 결정 반영: 횟수권만, 단일 활성, 만료일 수정 가능. PERIOD/MIXED, HOLD 등 미사용 enum 값은 YAGNI 차원에서 미도입.
+
+- [x] 기존 `Member.remainingSessions/totalSessions/membershipType` 컬럼 제거
+- [x] 기존 `enum MembershipType { GROUPS PRIVATE DUET }` 를 `enum ClassType` 으로 rename (사실은 수업 유형이었음). `ClassSession.type` 도 함께 변경
+- [x] 신규 모델 `Membership { id memberId totalCount remainingCount startDate endDate status }` + `enum MembershipStatus { ACTIVE EXPIRED CANCELLED }` ([apps/api/prisma/schema.prisma](../apps/api/prisma/schema.prisma))
+- [x] 단일 활성 회원권 정책: 신규 발급 시 기존 ACTIVE 회원권을 자동 CANCELLED 처리 (애플리케이션 로직, [routes/memberships.ts](../apps/api/src/routes/memberships.ts))
+- [x] 예약 생성/취소를 `prisma.$transaction` 으로 감싸 활성 회원권의 `remainingCount` 를 차감/복구. 만료(`endDate < now`)·잔여 0 인 경우 400 차단. 정원 초과도 함께 차단 ([routes/reservations.ts](../apps/api/src/routes/reservations.ts))
+- [x] 신규 라우트 `GET/POST/PATCH/DELETE /api/memberships` (PATCH 가 endDate 수정 — 사용자 핵심 요구) — admin-only
+- [x] [seed.ts](../apps/api/prisma/seed.ts): Member 에 legacy 필드 없이 시드, 각 회원에게 90일 만료 횟수권 1건 발급
+- [x] 어드민: `types/index.ts` 에 Membership 타입 + ClassType rename, `utils/api.ts` 에 fetchMemberships/createMembership/updateMembership/deleteMembership 추가
+- [x] MemberCard 가 활성 회원권 요약(잔여/총량/만료일) 표시, MemberForm 에서 legacy 필드 제거
+- [x] 신규 페이지 `/memberships` (목록 + 발급 + 만료일 수정) + Sidebar 엔트리 추가
+- [x] mockData.ts 는 무효화돼 빈 stub 으로 비워둠 (Phase 6 에서 일괄 제거)
+- [x] 검증: `npm run build:admin && npm run build:api` 모두 exit 0
 
 ### Integration Phase 4 — 결제 모델 (PRD 3.6)
 - 신규 모델 `Payment { id memberId membershipId? method amount status installments? receiptNo paidAt refundedAt }`
@@ -165,7 +173,7 @@
 | Integration Phase 1 — Monorepo 재편성 | ✅ 완료 | `feature/integrate-landing-and-auth` 브랜치, 커밋 완료 |
 | Integration Phase 1.5 — 기존 빌드 에러 정리 | ✅ 완료 | admin/api 빌드 green |
 | Integration Phase 2 — JWT 인증 도입 | ✅ 완료 | bcrypt + jsonwebtoken, /api/* 전부 ADMIN-only, /login 페이지 |
-| Integration Phase 3 — Membership 테이블 분리 | ⬜ 예정 | PRD 3.2, 결제 확장 대비 |
+| Integration Phase 3 — Membership 테이블 분리 | ✅ 완료 | 횟수권 단일활성, endDate 수정 가능, 예약 트랜잭션화 |
 | Integration Phase 4 — Payment 모델 | ⬜ 예정 | PRD 3.6 |
 | Integration Phase 5 — 부가 기능 | ⬜ 예정 | 신체평가/강사스케줄/알림/대시보드 확장 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

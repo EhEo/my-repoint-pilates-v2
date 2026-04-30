@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 저장소 구조 (npm workspaces)
 
-```
+```text
 my-repoint-pilates-v2/
 ├── apps/
 │   ├── admin/      ← React 19 + Vite 7 + RR7 + Recharts (관리자 SPA)
@@ -55,19 +55,21 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 ## 아키텍처 메모
 
-**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/auth`(공개), 그리고 `/api/members`, `/api/classes`, `/api/instructors`, `/api/reservations`, `/api/dashboard`(전부 `[requireAuth, requireRole('ADMIN')]` 적용 — Phase 2). 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)의 공통 `request<T>()` 헬퍼로 호출하며, 토큰은 [apps/admin/src/utils/auth.ts](apps/admin/src/utils/auth.ts)에서 `localStorage`로 관리하고 401이 떨어지면 자동으로 세션을 비우고 `/login`으로 보낸다. `VITE_API_URL` 기본값은 `http://localhost:3000`.
+**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/auth`(공개), 그리고 `/api/members`, `/api/memberships`, `/api/classes`, `/api/instructors`, `/api/reservations`, `/api/dashboard`(전부 `[requireAuth, requireRole('ADMIN')]` 적용 — Phase 2). 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)의 공통 `request<T>()` 헬퍼로 호출하며, 토큰은 [apps/admin/src/utils/auth.ts](apps/admin/src/utils/auth.ts)에서 `localStorage`로 관리하고 401이 떨어지면 자동으로 세션을 비우고 `/login`으로 보낸다. `VITE_API_URL` 기본값은 `http://localhost:3000`.
 
 **인증.** JWT(`HS256`, 기본 만료 `7d`). 시드 ([apps/api/prisma/seed.ts](apps/api/prisma/seed.ts))가 `.env`의 `ADMIN_EMAIL`/`ADMIN_PASSWORD`로 admin User를 upsert하고, 시드는 도메인 데이터(`Reservation`/`ClassSession`/`Member`/`Instructor`)만 비우며 **`User` 테이블은 보존한다**. `prisma:seed` 스크립트는 `ts-node prisma/seed.ts` 단일 소스 — 손수 컴파일된 `seed.js`는 더 이상 존재하지 않음. [seed-api.js](apps/api/seed-api.js)도 admin 로그인 후 `Authorization: Bearer ...`로 호출. 환경변수는 [apps/api/.env.example](apps/api/.env.example) 참고, 실값은 gitignored `.env`. 미들웨어는 [apps/api/src/middleware/requireAuth.ts](apps/api/src/middleware/requireAuth.ts)에서 `req.user: JwtPayload`를 attach.
 
-**예약 불변식.** [apps/api/src/routes/reservations.ts](apps/api/src/routes/reservations.ts)에서 예약 생성/취소 시 `ClassSession.enrolled`와 `Member.remainingSessions`를 함께 갱신한다. 이 세 가지 업데이트는 **트랜잭션 안에 있지 않다** — Phase 3에서 `prisma.$transaction`으로 감싸고, `Membership` 별도 테이블이 도입되면 잔여 횟수 차감 대상도 함께 변경 예정. 정원 체크는 아직 단순화되어 있다.
+**회원권 모델 (Phase 3).** `Member` 에는 더 이상 `remainingSessions/totalSessions/membershipType` 컬럼이 없다. 대신 별도 `Membership` 테이블이 횟수권을 표현 (`totalCount`, `remainingCount`, `startDate`, 필수 `endDate`, `status`). 정책: **회원당 단일 활성 회원권만 허용** — 스키마 unique 제약은 없고 [routes/memberships.ts](apps/api/src/routes/memberships.ts)에서 신규 발급 시 기존 ACTIVE 를 자동 CANCELLED 처리. PERIOD/MIXED 회원권, HOLD 상태는 미도입(YAGNI). 만료일은 PATCH 로 항상 수정 가능.
 
-**Enum 대소문자.** Prisma enum은 대문자(`ACTIVE`, `GROUPS`, `BEGINNER`, `CONFIRMED`)로 통일. 통합 결정상 v2 컨벤션을 따른다. [apps/admin/src/types/index.ts](apps/admin/src/types/index.ts)는 일부 소문자 string union이 남아 있고 `ReservationStatus`만 양쪽을 받도록 되어 있는데, Phase 6에서 일괄 정리한다. 새 코드를 추가할 때는 항상 대문자를 따른다.
+**예약 불변식 (Phase 3).** [routes/reservations.ts](apps/api/src/routes/reservations.ts) 의 생성/취소가 모두 `prisma.$transaction` 안에 있다. 생성 시 (1) ClassSession 정원 체크, (2) 활성·미만료·잔여 ≥1 인 Membership 조회 후 `endDate` 가까운 순으로 1건 차감, (3) `ClassSession.enrolled` 증가. 활성 회원권이 없으면 400 으로 차단. 취소 시 같은 회원의 가장 가까운 ACTIVE 회원권에 환불 — 결과적으로 발급한 회원권으로 환불되지 않을 수 있다는 점에 유의 (단일 활성 정책 하에선 실무상 문제 없음).
+
+**Enum 대소문자 / rename.** Prisma enum 은 대문자(`ACTIVE`, `BEGINNER`, `CONFIRMED`)로 통일. **Phase 3 에서 기존 `enum MembershipType { GROUPS PRIVATE DUET }` 는 사실 수업 유형이라 `enum ClassType` 으로 rename**, `ClassSession.type` 도 같이 변경. [apps/admin/src/types/index.ts](apps/admin/src/types/index.ts) 는 일부 소문자 union 이 호환성으로 남아 있고 `ReservationStatus` 만 양쪽을 받도록 되어 있는데, Phase 6 에서 일괄 정리. **새 코드를 추가할 때는 항상 대문자를 따른다.**
 
 **Mock 데이터 vs 실제 API.** `apps/admin/src/utils/mock*Data.ts`가 `api.ts`와 같이 존재한다. 페이지마다 둘 중 어느 것을 쓰는지 다를 수 있으므로, API 변경이 UI에 반영될지 확인하기 전에 해당 페이지를 먼저 확인할 것. Phase 6에서 정리.
 
 **스타일링.** CSS 프레임워크 없음. 디자인 토큰은 [apps/admin/src/styles/variables.css](apps/admin/src/styles/variables.css)의 CSS custom property로 정의 (HSL 3쌍을 `hsl(var(--color-*))`로 소비, `--space-*`, `--radius-*`, `--shadow-*`). 컴포넌트는 인라인 `<style>`이나 글로벌 클래스명을 사용. `.dark` 토큰 오버라이드는 정의되어 있지만 테마 토글 UI는 미연결.
 
-**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/classes`, `/reservations` 페이지가 마운트. 전체 쉘은 [RequireAuth](apps/admin/src/components/auth/RequireAuth.tsx)로 감싸고, 공개 `/login`만 그 바깥. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트.
+**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/memberships`, `/classes`, `/reservations` 페이지가 마운트. 전체 쉘은 [RequireAuth](apps/admin/src/components/auth/RequireAuth.tsx)로 감싸고, 공개 `/login`만 그 바깥. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트.
 
 **랜딩 페이지.** [apps/landing](apps/landing)은 빌드 단계 없는 vanilla HTML/CSS/JS다. [apps/landing/index.html](apps/landing/index.html) 단일 파일이 거의 모든 콘텐츠를 담고 있고, [service-worker.js](apps/landing/service-worker.js)가 PWA 오프라인 캐시를 담당한다. 어드민과 무관하게 단독 호스팅 가능 (정적 호스팅 대상).
 

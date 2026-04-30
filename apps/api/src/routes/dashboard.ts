@@ -4,7 +4,6 @@ import prisma from '../lib/prisma';
 
 const router = Router();
 
-type MemberMembershipRow = { membershipType: Prisma.MemberGetPayload<{}>['membershipType'] };
 type ReservationWithRelations = Prisma.ReservationGetPayload<{
     include: { member: true; classSession: true };
 }>;
@@ -21,24 +20,23 @@ router.get('/stats', async (req, res) => {
 
         const classesToday = await prisma.classSession.count({
             where: {
-                date: {
-                    gte: startOfDay,
-                    lte: endOfDay
-                }
+                date: { gte: startOfDay, lte: endOfDay }
             }
         });
 
-        // Calculate revenue (Mock calculation based on membership types for now)
-        // In a real app, this would come from a Payment/Transaction table
-        const members = await prisma.member.findMany({ select: { membershipType: true } });
-        const revenue = members.reduce((acc: number, curr: MemberMembershipRow) => {
-            if (curr.membershipType === 'PRIVATE') return acc + 100;
-            if (curr.membershipType === 'DUET') return acc + 70;
-            return acc + 30; // GROUPS
-        }, 0) * 1000; // Mock currency multiplier
+        // Mock revenue: sum of remainingCount across active memberships * a flat
+        // unit price. Replaced by the Payment table in Phase 4.
+        const activeMemberships = await prisma.membership.findMany({
+            where: { status: 'ACTIVE' },
+            select: { totalCount: true },
+        });
+        const SESSION_UNIT_PRICE = 50_000; // KRW, mock
+        const revenue =
+            activeMemberships.reduce((acc: number, m: { totalCount: number }) => acc + m.totalCount, 0) *
+            SESSION_UNIT_PRICE;
 
         const activeReservations = await prisma.reservation.count({
-            where: { status: 'WAITLIST' } // Treating waitlist as pending requests for this context
+            where: { status: 'WAITLIST' }
         });
 
         res.json({
@@ -48,13 +46,13 @@ router.get('/stats', async (req, res) => {
             pendingRequests: activeReservations
         });
     } catch (error) {
+        console.error('[dashboard/stats]', error);
         res.status(500).json({ error: 'Failed to fetch dashboard stats' });
     }
 });
 
 router.get('/recent-activity', async (req, res) => {
     try {
-        // Fetch recent reservations as activity
         const recentReservations = await prisma.reservation.findMany({
             take: 5,
             orderBy: { timestamp: 'desc' },
@@ -66,7 +64,7 @@ router.get('/recent-activity', async (req, res) => {
             user: r.member.name,
             action: r.status === 'CONFIRMED' ? 'booked a class' : 'cancelled a reservation',
             target: r.classSession.title,
-            time: 'Just now' // Simplified time
+            time: 'Just now'
         }));
 
         res.json(activity);

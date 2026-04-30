@@ -73,6 +73,27 @@ export const fetchMembers = () => request<any[]>('/api/members');
 export const createMember = (data: any) =>
     request<any>('/api/members', { method: 'POST', body: data });
 
+// ── Memberships (Phase 3 — 횟수권) ─────────────────────────────────────────
+export const fetchMemberships = (params?: { memberId?: string; status?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.memberId) qs.set('memberId', params.memberId);
+    if (params?.status) qs.set('status', params.status);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return request<any[]>(`/api/memberships${suffix}`);
+};
+export const createMembership = (data: {
+    memberId: string;
+    totalCount: number;
+    endDate: string;
+    startDate?: string;
+}) => request<any>('/api/memberships', { method: 'POST', body: data });
+export const updateMembership = (
+    id: string,
+    data: { endDate?: string; totalCount?: number; remainingCount?: number; status?: string }
+) => request<any>(`/api/memberships/${id}`, { method: 'PATCH', body: data });
+export const deleteMembership = (id: string) =>
+    request<any>(`/api/memberships/${id}`, { method: 'DELETE' });
+
 export const fetchClasses = (date?: string) =>
     request<any[]>(date ? `/api/classes?date=${date}` : '/api/classes');
 export const createClass = (data: any) =>

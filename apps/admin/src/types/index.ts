@@ -1,5 +1,9 @@
-export type MembershipType = 'groups' | 'private' | 'duet';
-export type MemberStatus = 'active' | 'inactive' | 'paused';
+// Phase 3: Member 의 legacy 회원권 컬럼은 Membership 테이블로 분리됨.
+// 기존 'MembershipType' (groups/private/duet) 은 사실 수업 유형이라 ClassType 으로 rename.
+
+export type ClassType = 'GROUPS' | 'PRIVATE' | 'DUET' | 'groups' | 'private' | 'duet';
+export type MemberStatus = 'ACTIVE' | 'INACTIVE' | 'PAUSED' | 'active' | 'inactive' | 'paused';
+export type MembershipStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
 
 export interface Member {
     id: string;
@@ -8,13 +12,23 @@ export interface Member {
     phone: string;
     avatar?: string;
     status: MemberStatus;
-    membershipType: MembershipType;
-    remainingSessions: number;
-    totalSessions: number;
     joinDate: string;
-    lastVisit: string;
-    nextReservation?: string;
+    lastVisit?: string | null;
     notes?: string;
+    memberships?: Membership[]; // optional — included by /api/members
+}
+
+export interface Membership {
+    id: string;
+    memberId: string;
+    member?: Member;
+    totalCount: number;
+    remainingCount: number;
+    startDate: string;
+    endDate: string;
+    status: MembershipStatus;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Instructor {
@@ -26,19 +40,19 @@ export interface Instructor {
     status: 'active' | 'inactive' | 'leave';
 }
 
-export type ClassLevel = 'beginner' | 'intermediate' | 'advanced' | 'all';
+export type ClassLevel = 'beginner' | 'intermediate' | 'advanced' | 'all' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
 
 export interface ClassSession {
     id: string;
     title: string;
     instructorId: string;
     instructorName: string;
-    date: string; // YYYY-MM-DD
-    startTime: string; // HH:mm
-    endTime: string; // HH:mm
+    date: string;
+    startTime: string;
+    endTime: string;
     capacity: number;
     enrolled: number;
-    type: MembershipType;
+    type: ClassType;
     level: ClassLevel;
     room: string;
 }
@@ -49,7 +63,7 @@ export interface Reservation {
     id: string;
     memberId: string;
     classId: string;
-    classSession: ClassSession; // Embedded for easier display
+    classSession: ClassSession;
     status: ReservationStatus;
     timestamp: string;
 }

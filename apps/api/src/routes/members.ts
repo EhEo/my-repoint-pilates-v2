@@ -3,11 +3,17 @@ import prisma from '../lib/prisma';
 
 const router = Router();
 
-// Get all members
 router.get('/', async (req, res) => {
     try {
         const members = await prisma.member.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            include: {
+                memberships: {
+                    where: { status: 'ACTIVE' },
+                    orderBy: { endDate: 'asc' },
+                    take: 1,
+                },
+            },
         });
         res.json(members);
     } catch (error) {
@@ -15,11 +21,13 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get single member
 router.get('/:id', async (req, res) => {
     try {
         const member = await prisma.member.findUnique({
-            where: { id: req.params.id }
+            where: { id: req.params.id },
+            include: {
+                memberships: { orderBy: { createdAt: 'desc' } },
+            },
         });
         if (!member) return res.status(404).json({ error: 'Member not found' });
         res.json(member);
@@ -28,18 +36,11 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create member
 router.post('/', async (req, res) => {
     try {
-        const { name, email, phone, status, membershipType } = req.body;
+        const { name, email, phone, status, notes } = req.body;
         const member = await prisma.member.create({
-            data: {
-                name,
-                email,
-                phone,
-                status,
-                membershipType
-            }
+            data: { name, email, phone, status, notes },
         });
         res.json(member);
     } catch (error) {
@@ -47,13 +48,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update member
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
+        const { name, email, phone, status, notes, avatar, lastVisit } = req.body;
         const member = await prisma.member.update({
             where: { id },
-            data: req.body
+            data: { name, email, phone, status, notes, avatar, lastVisit },
         });
         res.json(member);
     } catch (error) {
@@ -61,12 +62,9 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete member
 router.delete('/:id', async (req, res) => {
     try {
-        await prisma.member.delete({
-            where: { id: req.params.id }
-        });
+        await prisma.member.delete({ where: { id: req.params.id } });
         res.json({ message: 'Member deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete member' });

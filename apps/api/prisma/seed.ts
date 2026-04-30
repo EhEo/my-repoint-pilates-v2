@@ -28,10 +28,10 @@ async function main() {
     // Clean up existing domain data (does NOT touch User table)
     await prisma.reservation.deleteMany();
     await prisma.classSession.deleteMany();
+    await prisma.membership.deleteMany();
     await prisma.member.deleteMany();
     await prisma.instructor.deleteMany();
 
-    // Create Instructor
     const instructor = await prisma.instructor.create({
         data: {
             name: 'Sarah Connor',
@@ -40,37 +40,50 @@ async function main() {
             status: 'active',
         },
     });
-
     console.log('Created instructor:', instructor.name);
 
-    // Create Members
     const member1 = await prisma.member.create({
         data: {
             name: 'Alice Johnson',
             email: 'alice@example.com',
             phone: '010-1234-5678',
             status: 'ACTIVE',
-            membershipType: 'GROUPS',
-            totalSessions: 10,
-            remainingSessions: 8,
         },
     });
-
     const member2 = await prisma.member.create({
         data: {
             name: 'Bob Smith',
             email: 'bob@example.com',
             phone: '010-9876-5432',
             status: 'ACTIVE',
-            membershipType: 'PRIVATE',
-            totalSessions: 20,
-            remainingSessions: 15,
         },
     });
-
     console.log('Created members:', member1.name, member2.name);
 
-    // Create Classes (Today and Tomorrow)
+    // Each member gets one ACTIVE 횟수권 expiring in 90 days
+    const ninetyDaysFromNow = new Date();
+    ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
+
+    await prisma.membership.create({
+        data: {
+            memberId: member1.id,
+            totalCount: 10,
+            remainingCount: 8,
+            endDate: ninetyDaysFromNow,
+            status: 'ACTIVE',
+        },
+    });
+    await prisma.membership.create({
+        data: {
+            memberId: member2.id,
+            totalCount: 20,
+            remainingCount: 15,
+            endDate: ninetyDaysFromNow,
+            status: 'ACTIVE',
+        },
+    });
+    console.log('Created memberships for both members.');
+
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -89,7 +102,6 @@ async function main() {
             room: 'Room A',
         },
     });
-
     const class2 = await prisma.classSession.create({
         data: {
             title: 'Private Session',
@@ -104,10 +116,8 @@ async function main() {
             room: 'Room B',
         },
     });
-
     console.log('Created classes:', class1.title, class2.title);
 
-    // Create Reservation
     await prisma.reservation.create({
         data: {
             memberId: member1.id,
@@ -115,7 +125,6 @@ async function main() {
             status: 'CONFIRMED',
         },
     });
-
     console.log('Created reservation for', member1.name);
 
     console.log('Seeding finished.');

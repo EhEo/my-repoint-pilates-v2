@@ -12,8 +12,6 @@ const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
         phone: '',
         email: '',
         status: 'ACTIVE',
-        membershipType: 'GROUPS',
-        totalSessions: 10,
         notes: ''
     });
 
@@ -70,37 +68,18 @@ const MemberForm: React.FC<MemberFormProps> = ({ onSubmit, onCancel }) => {
                 />
             </div>
 
-            <div className="form-row">
-                <div className="form-group">
-                    <label htmlFor="status">Status</label>
-                    <select name="status" id="status" value={formData.status} onChange={handleChange}>
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
-                        <option value="PAUSED">Paused</option>
-                    </select>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="membershipType">Membership</label>
-                    <select name="membershipType" id="membershipType" value={formData.membershipType} onChange={handleChange}>
-                        <option value="GROUPS">Group Class</option>
-                        <option value="PRIVATE">Private (1:1)</option>
-                        <option value="DUET">Duet (2:1)</option>
-                    </select>
-                </div>
-            </div>
-
             <div className="form-group">
-                <label htmlFor="totalSessions">Total Sessions</label>
-                <input
-                    type="number"
-                    id="totalSessions"
-                    name="totalSessions"
-                    min="1"
-                    value={formData.totalSessions}
-                    onChange={handleChange}
-                />
+                <label htmlFor="status">Status</label>
+                <select name="status" id="status" value={formData.status} onChange={handleChange}>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                    <option value="PAUSED">Paused</option>
+                </select>
             </div>
+
+            <p className="hint text-muted">
+                회원권(횟수권)은 회원 등록 후 별도의 Memberships 페이지에서 발급합니다.
+            </p>
 
             <div className="form-group">
                 <label htmlFor="notes">Notes</label>

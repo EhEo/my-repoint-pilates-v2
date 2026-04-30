@@ -15,7 +15,9 @@ enum MemberStatus {
   PAUSED
 }
 
-enum MembershipType {
+// Class delivery format (formerly named MembershipType — renamed in Phase 3
+// to disambiguate from Membership records).
+enum ClassType {
   GROUPS
   PRIVATE
   DUET
@@ -40,6 +42,12 @@ enum Role {
   MEMBER
 }
 
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 // Models
 
 model User {
@@ -52,71 +60,88 @@ model User {
 }
 
 model Member {
-  id                String         @id @default(uuid())
-  name              String
-  email             String         @unique
-  phone             String
-  avatar            String?
-  status            MemberStatus   @default(ACTIVE)
-  membershipType    MembershipType @default(GROUPS)
-  remainingSessions Int            @default(0)
-  totalSessions     Int            @default(0)
-  joinDate          DateTime       @default(now())
-  lastVisit         DateTime?
-  notes             String?
-  
-  reservations      Reservation[]
-  
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id        String       @id @default(uuid())
+  name      String
+  email     String       @unique
+  phone     String
+  avatar    String?
+  status    MemberStatus @default(ACTIVE)
+  joinDate  DateTime     @default(now())
+  lastVisit DateTime?
+  notes     String?
+
+  memberships  Membership[]
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Count-based membership (횟수권). Single active membership per member is
+// enforced in application logic — schema does not unique-constrain this so
+// historical (EXPIRED/CANCELLED) records can coexist with a current ACTIVE one.
+model Membership {
+  id             String           @id @default(uuid())
+  memberId       String
+  member         Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  totalCount     Int
+  remainingCount Int
+  startDate      DateTime         @default(now())
+  endDate        DateTime
+  status         MembershipStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId, status])
 }
 
 model Instructor {
   id          String   @id @default(uuid())
   name        String
   email       String   @unique
-  specialties String[] 
+  specialties String[]
   avatar      String?
   status      String   @default("active") // active, inactive, leave
-  
-  classes     ClassSession[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  classes ClassSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ClassSession {
-  id             String         @id @default(uuid())
-  title          String
-  date           DateTime       // YYYY-MM-DD handled as DateTime
-  startTime      String         // HH:mm
-  endTime        String         // HH:mm
-  capacity       Int
-  enrolled       Int            @default(0)
-  type           MembershipType
-  level          ClassLevel
-  room           String
-  
-  instructorId   String
-  instructor     Instructor     @relation(fields: [instructorId], references: [id])
-  
-  reservations   Reservation[]
-  
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id        String     @id @default(uuid())
+  title     String
+  date      DateTime // YYYY-MM-DD handled as DateTime
+  startTime String // HH:mm
+  endTime   String // HH:mm
+  capacity  Int
+  enrolled  Int        @default(0)
+  type      ClassType
+  level     ClassLevel
+  room      String
+
+  instructorId String
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Reservation {
-  id             String            @id @default(uuid())
-  status         ReservationStatus @default(CONFIRMED)
-  timestamp      DateTime          @default(now())
-  
-  memberId       String
-  member         Member            @relation(fields: [memberId], references: [id])
-  
+  id        String            @id @default(uuid())
+  status    ReservationStatus @default(CONFIRMED)
+  timestamp DateTime          @default(now())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
   classSessionId String
-  classSession   ClassSession      @relation(fields: [classSessionId], references: [id])
-  
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  classSession   ClassSession @relation(fields: [classSessionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

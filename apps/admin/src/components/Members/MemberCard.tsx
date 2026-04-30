@@ -7,6 +7,9 @@ interface MemberCardProps {
 }
 
 const MemberCard = ({ member }: MemberCardProps) => {
+    const activeMembership = member.memberships?.[0];
+    const statusKey = (member.status || '').toString().toLowerCase();
+
     return (
         <div className="card member-card">
             <div className="card-header">
@@ -16,12 +19,12 @@ const MemberCard = ({ member }: MemberCardProps) => {
                     </div>
                     <div>
                         <h3>{member.name}</h3>
-                        <span className={clsx('status-badge', member.status)}>
+                        <span className={clsx('status-badge', statusKey)}>
                             {member.status}
                         </span>
                     </div>
                 </div>
-                <button className="icon-btn">
+                <button type="button" className="icon-btn" aria-label="Member actions">
                     <MoreHorizontal size={20} />
                 </button>
             </div>
@@ -30,11 +33,24 @@ const MemberCard = ({ member }: MemberCardProps) => {
                 <div className="stat-row">
                     <div className="stat-item">
                         <span className="label">Sessions</span>
-                        <span className="value">{member.remainingSessions} <span className="text-muted">/ {member.totalSessions}</span></span>
+                        <span className="value">
+                            {activeMembership ? (
+                                <>
+                                    {activeMembership.remainingCount}{' '}
+                                    <span className="text-muted">/ {activeMembership.totalCount}</span>
+                                </>
+                            ) : (
+                                <span className="text-muted">No active membership</span>
+                            )}
+                        </span>
                     </div>
                     <div className="stat-item right">
-                        <span className="label">Membership</span>
-                        <span className="value capitalize">{member.membershipType}</span>
+                        <span className="label">Expires</span>
+                        <span className="value">
+                            {activeMembership
+                                ? new Date(activeMembership.endDate).toLocaleDateString()
+                                : '—'}
+                        </span>
                     </div>
                 </div>
 
@@ -45,18 +61,18 @@ const MemberCard = ({ member }: MemberCardProps) => {
                         <Calendar size={16} />
                     </div>
                     <div className="session-info">
-                        <span className="label">Next Reservation</span>
+                        <span className="label">Last Visit</span>
                         <span className="value">
-                            {member.nextReservation
-                                ? new Date(member.nextReservation).toLocaleDateString()
-                                : 'No booking'}
+                            {member.lastVisit
+                                ? new Date(member.lastVisit).toLocaleDateString()
+                                : 'Never'}
                         </span>
                     </div>
                 </div>
             </div>
 
             <div className="card-footer">
-                <button className="btn btn-secondary full-width">View Profile</button>
+                <button type="button" className="btn btn-secondary full-width">View Profile</button>
             </div>
 
             <style>{`

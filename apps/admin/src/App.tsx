@@ -4,6 +4,7 @@ import RequireAuth from './components/auth/RequireAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
+import Memberships from './pages/Memberships';
 import Classes from './pages/Classes';
 import Reservations from './pages/Reservations';
 
@@ -22,6 +23,7 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="members" element={<Members />} />
+          <Route path="memberships" element={<Memberships />} />
           <Route path="classes" element={<Classes />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="settings" element={<div>Settings Page (Coming Soon)</div>} />
