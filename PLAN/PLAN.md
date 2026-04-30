@@ -160,8 +160,20 @@
 
 - **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
 - ✅ **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델 — Phase 5B 로 분리 완료. 대강 신청/승인 워크플로우는 별도 단계로 미룸
-- **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁)
+- ✅ **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁) — Phase 5C 로 분리 완료
 - ✅ **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts` 에 일/주/월/년 매출 집계 — Phase 5D 로 분리 완료
+
+#### ✅ Integration Phase 5C — 알림 시스템 — 완료
+
+- [x] Schema: `Notification` + `enum NotificationType { RESERVATION_CONFIRMED, RESERVATION_CANCELLED, MEMBERSHIP_EXPIRY }` + `NotificationChannel { APP, SMS, KAKAO, EMAIL }` + `NotificationStatus { PENDING, SENT, FAILED }` + `RecipientType { MEMBER, INSTRUCTOR, ADMIN }`. `payload` 는 Json, `recipientType, recipientId` 인덱스
+- [x] [lib/notifications.ts](../apps/api/src/lib/notifications.ts): `enqueueAndDispatch()` — 레코드 생성 후 즉시 채널 어댑터 호출, 성공 시 SENT/sentAt, 실패는 FAILED/errorMessage 로 기록. 어댑터는 모두 콘솔 로깅 stub
+- [x] [routes/notifications.ts](../apps/api/src/routes/notifications.ts): GET (필터: recipientType / recipientId / status / type), PATCH (수동 토글), DELETE
+- [x] `POST /api/notifications/scan-expiries` — ACTIVE 회원권의 만료 7/3/1일 전 알림을 일괄 발행. 24시간 내 같은 (memberId, type) 중복 발행 방지. 스케줄러 도입 전까지 admin 이 수동 호출
+- [x] [reservations.ts](../apps/api/src/routes/reservations.ts) 트리거: 예약 생성 시 회원에게 RESERVATION_CONFIRMED + 강사에게 신규 예약 알림. 취소 시 강사에게 RESERVATION_CANCELLED. **트랜잭션 외부에서 발행** — stub 실패가 비즈니스 로직을 롤백하지 않도록
+- [x] 어드민 [/notifications](../apps/admin/src/pages/Notifications.tsx) 페이지: All/Sent/Pending/Failed 필터, "Scan membership expiries" 버튼, 행별 삭제. Sidebar 엔트리 추가
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
+
+**비-범위**: 클래스 2시간 전 리마인더 (스케줄러 필요), 자동 대기→확정 전환, 실제 SMS/카카오/이메일 송신 (어댑터는 stub).
 
 #### ✅ Integration Phase 5D — 대시보드 매출 위젯 확장 — 완료
 
@@ -209,5 +221,6 @@
 | Integration Phase 4 (mini) — 결제 플래그 | ✅ 완료 | Membership 에 paid/paidAt/refundedAt/paymentNote 수기 토글. 본격 Payment 모델은 보류 |
 | Integration Phase 5B — 강사 스케줄/휴무 | ✅ 완료 | InstructorSchedule + InstructorLeave + /schedules 페이지. 대강 워크플로우 미도입 |
 | Integration Phase 5D — 대시보드 매출 위젯 | ✅ 완료 | /api/dashboard/revenue 시계열, RevenueChart 실 데이터 + D/W/M/Y selector |
-| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 / 알림 |
+| Integration Phase 5C — 알림 시스템 | ✅ 완료 | Notification 모델 + 예약 트리거 + 만료 scan, 채널 어댑터는 stub |
+| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

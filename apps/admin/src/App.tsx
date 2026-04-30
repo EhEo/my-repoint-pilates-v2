@@ -8,6 +8,7 @@ import Memberships from './pages/Memberships';
 import Classes from './pages/Classes';
 import Schedules from './pages/Schedules';
 import Reservations from './pages/Reservations';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="classes" element={<Classes />} />
           <Route path="schedules" element={<Schedules />} />
           <Route path="reservations" element={<Reservations />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="settings" element={<div>Settings Page (Coming Soon)</div>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

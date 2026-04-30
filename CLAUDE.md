@@ -55,7 +55,7 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 ## 아키텍처 메모
 
-**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/auth`(공개), 그리고 `/api/members`, `/api/memberships`, `/api/classes`, `/api/instructors`, `/api/instructor-schedules`, `/api/instructor-leaves`, `/api/reservations`, `/api/dashboard`(전부 `[requireAuth, requireRole('ADMIN')]` 적용 — Phase 2). 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)의 공통 `request<T>()` 헬퍼로 호출하며, 토큰은 [apps/admin/src/utils/auth.ts](apps/admin/src/utils/auth.ts)에서 `localStorage`로 관리하고 401이 떨어지면 자동으로 세션을 비우고 `/login`으로 보낸다. `VITE_API_URL` 기본값은 `http://localhost:3000`.
+**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/auth`(공개), 그리고 `/api/members`, `/api/memberships`, `/api/classes`, `/api/instructors`, `/api/instructor-schedules`, `/api/instructor-leaves`, `/api/reservations`, `/api/dashboard`, `/api/notifications`(전부 `[requireAuth, requireRole('ADMIN')]` 적용 — Phase 2). 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)의 공통 `request<T>()` 헬퍼로 호출하며, 토큰은 [apps/admin/src/utils/auth.ts](apps/admin/src/utils/auth.ts)에서 `localStorage`로 관리하고 401이 떨어지면 자동으로 세션을 비우고 `/login`으로 보낸다. `VITE_API_URL` 기본값은 `http://localhost:3000`.
 
 **인증.** JWT(`HS256`, 기본 만료 `7d`). 시드 ([apps/api/prisma/seed.ts](apps/api/prisma/seed.ts))가 `.env`의 `ADMIN_EMAIL`/`ADMIN_PASSWORD`로 admin User를 upsert하고, 시드는 도메인 데이터(`Reservation`/`ClassSession`/`Member`/`Instructor`)만 비우며 **`User` 테이블은 보존한다**. `prisma:seed` 스크립트는 `ts-node prisma/seed.ts` 단일 소스 — 손수 컴파일된 `seed.js`는 더 이상 존재하지 않음. [seed-api.js](apps/api/seed-api.js)도 admin 로그인 후 `Authorization: Bearer ...`로 호출. 환경변수는 [apps/api/.env.example](apps/api/.env.example) 참고, 실값은 gitignored `.env`. 미들웨어는 [apps/api/src/middleware/requireAuth.ts](apps/api/src/middleware/requireAuth.ts)에서 `req.user: JwtPayload`를 attach.
 
@@ -69,11 +69,13 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 **스타일링.** CSS 프레임워크 없음. 디자인 토큰은 [apps/admin/src/styles/variables.css](apps/admin/src/styles/variables.css)의 CSS custom property로 정의 (HSL 3쌍을 `hsl(var(--color-*))`로 소비, `--space-*`, `--radius-*`, `--shadow-*`). 컴포넌트는 인라인 `<style>`이나 글로벌 클래스명을 사용. `.dark` 토큰 오버라이드는 정의되어 있지만 테마 토글 UI는 미연결.
 
-**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/memberships`, `/classes`, `/schedules`, `/reservations` 페이지가 마운트. 전체 쉘은 [RequireAuth](apps/admin/src/components/auth/RequireAuth.tsx)로 감싸고, 공개 `/login`만 그 바깥. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트.
+**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/memberships`, `/classes`, `/schedules`, `/reservations`, `/notifications` 페이지가 마운트. 전체 쉘은 [RequireAuth](apps/admin/src/components/auth/RequireAuth.tsx)로 감싸고, 공개 `/login`만 그 바깥. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트.
 
 **강사 스케줄/휴무 (Phase 5B).** 강사별 반복 가용 시간은 `InstructorSchedule { dayOfWeek (0=Sun..6=Sat), startTime "HH:mm", endTime "HH:mm" }` (instructor당 다수 슬롯). 휴무는 `InstructorLeave { startDate, endDate, reason? }` 로 일자 범위 override. **현재 ClassSession 생성 시점에 가용성을 강제 검사하지 않는다** — 데이터만 노출하고 스케줄 충돌 정책은 admin 판단에 맡김. 대강(substitution) 워크플로우는 미도입. Instructor 삭제 시 schedules/leaves 는 cascade 삭제. 어드민 [/schedules](apps/admin/src/pages/Schedules.tsx) 페이지에서 강사 picker로 골라 인라인 추가/삭제.
 
 **매출 시계열 (Phase 5D).** [`GET /api/dashboard/revenue?granularity=DAY|WEEK|MONTH|YEAR`](apps/api/src/routes/dashboard.ts) 가 cash-flow 관점의 시계열을 반환 — `paidAt` 기준 +gross, `refundedAt` 기준 +refunds, net = gross − refunds. 결측 버킷은 0 으로 채워 x-축 연속성을 보장하고 WEEK 는 ISO(월요일) 기준. **금액은 mock**: `Membership.totalCount × SESSION_UNIT_PRICE` ([apps/api/src/lib/pricing.ts](apps/api/src/lib/pricing.ts), 50,000 KRW) — Payment 모델이 도입되면 이 곱셈은 사라지고 `Payment.amount` 합산으로 바뀌어야 함. 어드민 [RevenueChart](apps/admin/src/components/Dashboard/RevenueChart.tsx) 가 4단위 selector + KRW 축약 포맷(`만`/`억`)으로 렌더링.
+
+**알림 시스템 (Phase 5C).** [`Notification`](apps/api/prisma/schema.prisma) 모델 + 트리거 + stub dispatcher. **현재 트리거되는 type은 3개만**: `RESERVATION_CONFIRMED`(예약 생성 시 회원·강사), `RESERVATION_CANCELLED`(취소 시 강사), `MEMBERSHIP_EXPIRY`(scan 엔드포인트). 스케줄러는 미도입이라 만료 알림은 `POST /api/notifications/scan-expiries`를 admin이 수동 호출 (24h 중복 발행 방지 내장). 채널 어댑터(`APP`/`SMS`/`KAKAO`/`EMAIL`)는 모두 콘솔 로깅 stub — [lib/notifications.ts](apps/api/src/lib/notifications.ts) 의 `enqueueAndDispatch()` 가 레코드 생성 + 즉시 dispatch + 결과를 SENT/FAILED 로 기록. **트리거 호출은 항상 트랜잭션 외부에서** — stub 실패가 비즈니스 로직을 롤백하지 않도록.
 
 **랜딩 페이지.** [apps/landing](apps/landing)은 빌드 단계 없는 vanilla HTML/CSS/JS다. [apps/landing/index.html](apps/landing/index.html) 단일 파일이 거의 모든 콘텐츠를 담고 있고, [service-worker.js](apps/landing/service-worker.js)가 PWA 오프라인 캐시를 담당한다. 어드민과 무관하게 단독 호스팅 가능 (정적 호스팅 대상).
 

@@ -160,6 +160,29 @@ export const cancelReservation = (id: string) =>
 export const fetchDashboardStats = () => request<any>('/api/dashboard/stats');
 export const fetchRecentActivity = () => request<any[]>('/api/dashboard/recent-activity');
 
+// ── Notifications (Phase 5C) ──────────────────────────────────────────────
+export const fetchNotifications = (params?: {
+    recipientType?: string;
+    recipientId?: string;
+    status?: string;
+    type?: string;
+}) => {
+    const qs = new URLSearchParams();
+    if (params?.recipientType) qs.set('recipientType', params.recipientType);
+    if (params?.recipientId) qs.set('recipientId', params.recipientId);
+    if (params?.status) qs.set('status', params.status);
+    if (params?.type) qs.set('type', params.type);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return request<any[]>(`/api/notifications${suffix}`);
+};
+export const scanMembershipExpiries = () =>
+    request<{ scanned: number[]; created: number; items: { memberId: string; daysBefore: number }[] }>(
+        '/api/notifications/scan-expiries',
+        { method: 'POST', body: {} }
+    );
+export const deleteNotification = (id: string) =>
+    request<any>(`/api/notifications/${id}`, { method: 'DELETE' });
+
 export type RevenueGranularity = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
 export interface RevenueSeriesResponse {
     granularity: RevenueGranularity;

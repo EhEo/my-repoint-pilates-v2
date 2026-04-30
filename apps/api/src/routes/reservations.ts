@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma';
+import { enqueueAndDispatch } from '../lib/notifications';
 
 const router = Router();
 
@@ -73,6 +74,30 @@ router.post('/', async (req, res) => {
             return created;
         });
 
+        // Phase 5C — fire notifications outside the transaction so a stub
+        // failure can't roll back the booking. enqueueAndDispatch swallows
+        // adapter errors and records them on the row.
+        const cs = reservation.classSession;
+        const dateStr = new Date(cs.date).toLocaleDateString('ko-KR');
+        await enqueueAndDispatch(prisma, {
+            type: 'RESERVATION_CONFIRMED',
+            channel: 'APP',
+            recipientType: 'MEMBER',
+            recipientId: reservation.memberId,
+            title: '예약이 확정되었습니다',
+            body: `${dateStr} ${cs.startTime} ${cs.title} 예약이 완료되었습니다.`,
+            payload: { reservationId: reservation.id, classSessionId: cs.id } as never,
+        });
+        await enqueueAndDispatch(prisma, {
+            type: 'RESERVATION_CONFIRMED',
+            channel: 'APP',
+            recipientType: 'INSTRUCTOR',
+            recipientId: cs.instructorId,
+            title: '신규 예약',
+            body: `${dateStr} ${cs.startTime} ${cs.title} 에 ${reservation.member.name} 회원이 예약했습니다.`,
+            payload: { reservationId: reservation.id, classSessionId: cs.id } as never,
+        });
+
         return res.json(reservation);
     } catch (error) {
         if (error instanceof HttpError) {
@@ -87,16 +112,16 @@ router.patch('/:id/cancel', async (req, res) => {
     try {
         const { id } = req.params;
 
-        const updated = await prisma.$transaction(async (tx) => {
+        const { wasAlreadyCancelled } = await prisma.$transaction(async (tx) => {
             const reservation = await tx.reservation.findUnique({ where: { id } });
             if (!reservation) {
                 throw new HttpError(404, 'Reservation not found');
             }
             if (reservation.status === 'CANCELLED') {
-                return reservation; // idempotent
+                return { wasAlreadyCancelled: true as const };
             }
 
-            const cancelled = await tx.reservation.update({
+            await tx.reservation.update({
                 where: { id },
                 data: { status: 'CANCELLED' },
             });
@@ -118,10 +143,34 @@ router.patch('/:id/cancel', async (req, res) => {
                 });
             }
 
-            return cancelled;
+            return { wasAlreadyCancelled: false as const };
         });
 
-        return res.json(updated);
+        const fresh = await prisma.reservation.findUnique({
+            where: { id },
+            include: { member: true, classSession: true },
+        });
+        if (!fresh) {
+            return res.status(404).json({ error: 'Reservation not found after cancel' });
+        }
+
+        // Notify the instructor only on the first cancellation (idempotent re-cancel
+        // skips the notification).
+        if (!wasAlreadyCancelled) {
+            const cs = fresh.classSession;
+            const dateStr = new Date(cs.date).toLocaleDateString('ko-KR');
+            await enqueueAndDispatch(prisma, {
+                type: 'RESERVATION_CANCELLED',
+                channel: 'APP',
+                recipientType: 'INSTRUCTOR',
+                recipientId: cs.instructorId,
+                title: '예약 취소',
+                body: `${dateStr} ${cs.startTime} ${cs.title} 의 ${fresh.member.name} 회원 예약이 취소되었습니다.`,
+                payload: { reservationId: fresh.id, classSessionId: cs.id } as never,
+            });
+        }
+
+        return res.json(fresh);
     } catch (error) {
         if (error instanceof HttpError) {
             return res.status(error.status).json({ error: error.message });

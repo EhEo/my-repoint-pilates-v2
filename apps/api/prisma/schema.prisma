@@ -48,6 +48,33 @@ enum MembershipStatus {
   CANCELLED
 }
 
+// Phase 5C — Notification system. Stubbed channel adapters; types kept narrow
+// to what is actually triggered today (reservation events, membership expiry scan).
+enum NotificationType {
+  RESERVATION_CONFIRMED
+  RESERVATION_CANCELLED
+  MEMBERSHIP_EXPIRY
+}
+
+enum NotificationChannel {
+  APP
+  SMS
+  KAKAO
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum RecipientType {
+  MEMBER
+  INSTRUCTOR
+  ADMIN
+}
+
 // Models
 
 model User {
@@ -134,6 +161,27 @@ model InstructorSchedule {
   updatedAt DateTime @updatedAt
 
   @@index([instructorId, dayOfWeek])
+}
+
+model Notification {
+  id            String              @id @default(uuid())
+  type          NotificationType
+  channel       NotificationChannel @default(APP)
+  status        NotificationStatus  @default(PENDING)
+  recipientType RecipientType
+  recipientId   String // Member.id, Instructor.id, or User.id depending on recipientType
+  title         String
+  body          String
+  payload       Json? // optional structured data for clients (memberId, classSessionId, daysBefore, etc.)
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  errorMessage  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([recipientType, recipientId])
+  @@index([status, scheduledFor])
 }
 
 // One-off unavailability override (휴무). Inclusive date range; for a single day,

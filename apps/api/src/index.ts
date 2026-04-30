@@ -13,6 +13,7 @@ import instructorScheduleRoutes from './routes/instructor-schedules';
 import instructorLeaveRoutes from './routes/instructor-leaves';
 import reservationRoutes from './routes/reservations';
 import dashboardRoutes from './routes/dashboard';
+import notificationRoutes from './routes/notifications';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/instructor-schedules', adminOnly, instructorScheduleRoutes);
 app.use('/api/instructor-leaves', adminOnly, instructorLeaveRoutes);
 app.use('/api/reservations', adminOnly, reservationRoutes);
 app.use('/api/dashboard', adminOnly, dashboardRoutes);
+app.use('/api/notifications', adminOnly, notificationRoutes);
 
 app.get('/', (req, res) => {
     res.send('Pilates System API is running');

@@ -67,6 +67,31 @@ export interface InstructorLeave {
     updatedAt: string;
 }
 
+export type NotificationType =
+    | 'RESERVATION_CONFIRMED'
+    | 'RESERVATION_CANCELLED'
+    | 'MEMBERSHIP_EXPIRY';
+export type NotificationChannel = 'APP' | 'SMS' | 'KAKAO' | 'EMAIL';
+export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED';
+export type RecipientType = 'MEMBER' | 'INSTRUCTOR' | 'ADMIN';
+
+export interface Notification {
+    id: string;
+    type: NotificationType;
+    channel: NotificationChannel;
+    status: NotificationStatus;
+    recipientType: RecipientType;
+    recipientId: string;
+    title: string;
+    body: string;
+    payload?: unknown;
+    scheduledFor?: string | null;
+    sentAt?: string | null;
+    errorMessage?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export type ClassLevel = 'beginner' | 'intermediate' | 'advanced' | 'all' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
 
 export interface ClassSession {

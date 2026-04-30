@@ -6,7 +6,8 @@ import {
     CalendarClock,
     Settings,
     Dumbbell,
-    Ticket
+    Ticket,
+    Bell
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -18,6 +19,7 @@ const Sidebar = () => {
         { icon: Calendar, label: 'Classes & Schedule', path: '/classes' },
         { icon: CalendarClock, label: 'Instructor Schedules', path: '/schedules' },
         { icon: Dumbbell, label: 'Reservations', path: '/reservations' },
+        { icon: Bell, label: 'Notifications', path: '/notifications' },
         { icon: Settings, label: 'Settings', path: '/settings' },
     ];
 
