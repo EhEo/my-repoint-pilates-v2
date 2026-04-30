@@ -3,8 +3,7 @@ import clsx from 'clsx';
 import ReservationCard from '../components/Reservations/ReservationCard';
 import Modal from '../components/common/Modal';
 import { fetchReservations, cancelReservation } from '../utils/api';
-// import { MOCK_RESERVATIONS } from '../utils/mockReservationData'; 
-import type { Reservation } from '../types';
+// import { MOCK_RESERVATIONS } from '../utils/mockReservationData';
 
 const Reservations = () => {
     const [reservations, setReservations] = useState<any[]>([]);

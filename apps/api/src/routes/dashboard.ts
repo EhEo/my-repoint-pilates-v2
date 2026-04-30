@@ -1,7 +1,13 @@
 import { Router } from 'express';
+import { Prisma } from '@prisma/client';
 import prisma from '../lib/prisma';
 
 const router = Router();
+
+type MemberMembershipRow = { membershipType: Prisma.MemberGetPayload<{}>['membershipType'] };
+type ReservationWithRelations = Prisma.ReservationGetPayload<{
+    include: { member: true; classSession: true };
+}>;
 
 router.get('/stats', async (req, res) => {
     try {
@@ -25,7 +31,7 @@ router.get('/stats', async (req, res) => {
         // Calculate revenue (Mock calculation based on membership types for now)
         // In a real app, this would come from a Payment/Transaction table
         const members = await prisma.member.findMany({ select: { membershipType: true } });
-        const revenue = members.reduce((acc, curr) => {
+        const revenue = members.reduce((acc: number, curr: MemberMembershipRow) => {
             if (curr.membershipType === 'PRIVATE') return acc + 100;
             if (curr.membershipType === 'DUET') return acc + 70;
             return acc + 30; // GROUPS
@@ -55,7 +61,7 @@ router.get('/recent-activity', async (req, res) => {
             include: { member: true, classSession: true }
         });
 
-        const activity = recentReservations.map(r => ({
+        const activity = recentReservations.map((r: ReservationWithRelations) => ({
             id: r.id,
             user: r.member.name,
             action: r.status === 'CONFIRMED' ? 'booked a class' : 'cancelled a reservation',

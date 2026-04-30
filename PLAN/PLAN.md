@@ -96,13 +96,14 @@
 - ⚠️ `npm run build:admin`/`build:api`에서 빌드 에러 3건 발견 — 이는 이번 통합 작업이 아니라 **v2 main에 원래 있던 코드 이슈**임 (`git diff --stat -M` 0 byte 변경으로 검증 완료). 아래 Phase 1.5에서 별도 처리.
 - ℹ️ Dev 모드(vite/ts-node)는 타입 에러를 차단하지 않으므로 정상 동작 가능 상태.
 
-### Integration Phase 1.5 — 기존 v2 빌드 에러 정리 (소규모)
+### ✅ Integration Phase 1.5 — 기존 v2 빌드 에러 정리 (소규모) — 완료
+
 **목표**: v2 main에서 누적된 타입 에러 3건을 해소해 `npm run build:admin/build:api`가 green 통과하게 한다. Phase 2 이후 의존성/스키마 변경으로 새 빌드 에러가 섞이기 전에 깨끗한 baseline을 확보.
 
-- [ ] [apps/admin/src/components/Dashboard/RevenueChart.tsx:43](../apps/admin/src/components/Dashboard/RevenueChart.tsx) — Recharts `Tooltip formatter`의 시그니처 미스매치 수정 (정확한 `Formatter<ValueType, NameType>` 타입에 맞추거나 인라인 타입 캐스트)
-- [ ] [apps/admin/src/pages/Reservations.tsx:7](../apps/admin/src/pages/Reservations.tsx) — 사용되지 않는 `Reservation` import 제거
-- [ ] [apps/api/src/routes/dashboard.ts](../apps/api/src/routes/dashboard.ts) — `acc`, `curr`, `r` 파라미터의 `implicit any` 타입 명시 (or `noImplicitAny`를 임시로 완화하지 말고 정확한 타입 부여)
-- [ ] 검증: `npm run build:admin && npm run build:api` 각각 exit code 0
+- [x] [apps/admin/src/components/Dashboard/RevenueChart.tsx:43](../apps/admin/src/components/Dashboard/RevenueChart.tsx) — Recharts v3의 `Formatter<ValueType, NameType>` 시그니처에 안 맞던 명시적 타입을 제거하고 추론에 맡김
+- [x] [apps/admin/src/pages/Reservations.tsx:7](../apps/admin/src/pages/Reservations.tsx) — 사용되지 않는 `Reservation` import 제거
+- [x] [apps/api/src/routes/dashboard.ts](../apps/api/src/routes/dashboard.ts) — `Prisma.ReservationGetPayload<{ include: ... }>` 등 Prisma 생성 타입을 활용해 `acc`/`curr`/`r` 파라미터 타입 명시
+- [x] 검증: `npm run build:admin && npm run build:api` 각각 exit code 0
 - 작은 단위 커밋 1건으로 처리
 
 ### Integration Phase 2 — JWT 인증 도입
@@ -154,8 +155,8 @@
 
 | Phase | 상태 | 비고 |
 | --- | --- | --- |
-| Integration Phase 1 — Monorepo 재편성 | ✅ 완료 | `feature/integrate-landing-and-auth` 브랜치, 커밋 대기 중 |
-| Integration Phase 1.5 — 기존 빌드 에러 정리 | ⬜ 예정 | v2 main에서 누적된 타입 에러 3건 |
+| Integration Phase 1 — Monorepo 재편성 | ✅ 완료 | `feature/integrate-landing-and-auth` 브랜치, 커밋 완료 |
+| Integration Phase 1.5 — 기존 빌드 에러 정리 | ✅ 완료 | admin/api 빌드 green |
 | Integration Phase 2 — JWT 인증 도입 | ⬜ 예정 | Pilates의 NestJS auth → Express 미들웨어 포팅 |
 | Integration Phase 3 — Membership 테이블 분리 | ⬜ 예정 | PRD 3.2, 결제 확장 대비 |
 | Integration Phase 4 — Payment 모델 | ⬜ 예정 | PRD 3.6 |

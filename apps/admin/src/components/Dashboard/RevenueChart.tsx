@@ -40,7 +40,7 @@ const RevenueChart: React.FC = () => {
                                 color: 'var(--color-text-primary)'
                             }}
                             itemStyle={{ color: 'var(--color-primary)' }}
-                            formatter={(value: number | string | Array<number | string> | undefined) => [`$${value}`, 'Revenue']}
+                            formatter={(value) => [`$${value}`, 'Revenue']}
                         />
                         <Area
                             type="monotone"
