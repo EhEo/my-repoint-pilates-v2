@@ -30,6 +30,8 @@ async function main() {
     await prisma.classSession.deleteMany();
     await prisma.membership.deleteMany();
     await prisma.member.deleteMany();
+    await prisma.instructorLeave.deleteMany();
+    await prisma.instructorSchedule.deleteMany();
     await prisma.instructor.deleteMany();
 
     const instructor = await prisma.instructor.create({
@@ -41,6 +43,17 @@ async function main() {
         },
     });
     console.log('Created instructor:', instructor.name);
+
+    // Default weekly availability: Mon..Fri 09:00–18:00
+    await prisma.instructorSchedule.createMany({
+        data: [1, 2, 3, 4, 5].map((dayOfWeek) => ({
+            instructorId: instructor.id,
+            dayOfWeek,
+            startTime: '09:00',
+            endTime: '18:00',
+        })),
+    });
+    console.log('Seeded weekly availability for', instructor.name);
 
     const member1 = await prisma.member.create({
         data: {

@@ -45,6 +45,28 @@ export interface Instructor {
     status: 'active' | 'inactive' | 'leave';
 }
 
+export interface InstructorSchedule {
+    id: string;
+    instructorId: string;
+    instructor?: { id: string; name: string };
+    dayOfWeek: number; // 0..6 (0=Sun)
+    startTime: string; // HH:mm
+    endTime: string;   // HH:mm
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface InstructorLeave {
+    id: string;
+    instructorId: string;
+    instructor?: { id: string; name: string };
+    startDate: string;
+    endDate: string;
+    reason?: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export type ClassLevel = 'beginner' | 'intermediate' | 'advanced' | 'all' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL';
 
 export interface ClassSession {

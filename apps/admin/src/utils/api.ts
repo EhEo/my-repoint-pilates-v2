@@ -112,6 +112,45 @@ export const fetchInstructors = () => request<any[]>('/api/instructors');
 export const createInstructor = (data: any) =>
     request<any>('/api/instructors', { method: 'POST', body: data });
 
+// ── Instructor schedules / leaves (Phase 5B) ──────────────────────────────
+export const fetchInstructorSchedules = (instructorId?: string) =>
+    request<any[]>(
+        instructorId
+            ? `/api/instructor-schedules?instructorId=${encodeURIComponent(instructorId)}`
+            : '/api/instructor-schedules'
+    );
+export const createInstructorSchedule = (data: {
+    instructorId: string;
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+}) => request<any>('/api/instructor-schedules', { method: 'POST', body: data });
+export const updateInstructorSchedule = (
+    id: string,
+    data: { dayOfWeek?: number; startTime?: string; endTime?: string }
+) => request<any>(`/api/instructor-schedules/${id}`, { method: 'PATCH', body: data });
+export const deleteInstructorSchedule = (id: string) =>
+    request<any>(`/api/instructor-schedules/${id}`, { method: 'DELETE' });
+
+export const fetchInstructorLeaves = (instructorId?: string) =>
+    request<any[]>(
+        instructorId
+            ? `/api/instructor-leaves?instructorId=${encodeURIComponent(instructorId)}`
+            : '/api/instructor-leaves'
+    );
+export const createInstructorLeave = (data: {
+    instructorId: string;
+    startDate: string;
+    endDate: string;
+    reason?: string;
+}) => request<any>('/api/instructor-leaves', { method: 'POST', body: data });
+export const updateInstructorLeave = (
+    id: string,
+    data: { startDate?: string; endDate?: string; reason?: string | null }
+) => request<any>(`/api/instructor-leaves/${id}`, { method: 'PATCH', body: data });
+export const deleteInstructorLeave = (id: string) =>
+    request<any>(`/api/instructor-leaves/${id}`, { method: 'DELETE' });
+
 export const fetchReservations = () => request<any[]>('/api/reservations');
 export const createReservation = (data: { memberId: string; classSessionId: string }) =>
     request<any>('/api/reservations', { method: 'POST', body: data });

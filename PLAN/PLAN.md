@@ -157,10 +157,20 @@
 - 할부 (사용자 요청으로 취소)
 
 ### Integration Phase 5 — 부가 기능 (선택, PRD 기반)
+
 - **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
-- **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델
+- ✅ **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델 — Phase 5B 로 분리 완료. 대강 신청/승인 워크플로우는 별도 단계로 미룸
 - **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁)
 - **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts`에 일/주/월/년 매출 집계
+
+#### ✅ Integration Phase 5B — 강사 스케줄/휴무 — 완료
+
+- [x] [schema.prisma](../apps/api/prisma/schema.prisma): `InstructorSchedule { id, instructorId, dayOfWeek (0..6), startTime "HH:mm", endTime "HH:mm" }` + `InstructorLeave { id, instructorId, startDate, endDate, reason? }`. Instructor 에 양방향 관계 + cascade 삭제
+- [x] 신규 라우트 [/api/instructor-schedules](../apps/api/src/routes/instructor-schedules.ts), [/api/instructor-leaves](../apps/api/src/routes/instructor-leaves.ts) — admin-only. 시간 형식·범위 검증 (HH:mm 정규식, dayOfWeek 0..6, start ≤ end)
+- [x] [seed.ts](../apps/api/prisma/seed.ts): 시드된 강사에게 월~금 09:00–18:00 기본 가용시간 자동 생성
+- [x] 어드민 신규 페이지 [/schedules](../apps/admin/src/pages/Schedules.tsx): 강사 picker + Weekly Availability / Leaves 두 패널, 인라인 추가/삭제. Sidebar 에 "Instructor Schedules" 엔트리 추가
+- [x] **의도적 비-범위**: ClassSession 생성 시점의 가용성 강제 체크 없음(데이터만 노출), 대강(substitution) 워크플로우 미도입
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
 
 ### Integration Phase 6 — 정리
 
@@ -184,5 +194,6 @@
 | Integration Phase 2 — JWT 인증 도입 | ✅ 완료 | bcrypt + jsonwebtoken, /api/* 전부 ADMIN-only, /login 페이지 |
 | Integration Phase 3 — Membership 테이블 분리 | ✅ 완료 | 횟수권 단일활성, endDate 수정 가능, 예약 트랜잭션화 |
 | Integration Phase 4 (mini) — 결제 플래그 | ✅ 완료 | Membership 에 paid/paidAt/refundedAt/paymentNote 수기 토글. 본격 Payment 모델은 보류 |
-| Integration Phase 5 — 부가 기능 | ⬜ 예정 | 신체평가/강사스케줄/알림/대시보드 확장 |
+| Integration Phase 5B — 강사 스케줄/휴무 | ✅ 완료 | InstructorSchedule + InstructorLeave + /schedules 페이지. 대강 워크플로우 미도입 |
+| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 / 알림 / 대시보드 확장 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |

@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
 import Memberships from './pages/Memberships';
 import Classes from './pages/Classes';
+import Schedules from './pages/Schedules';
 import Reservations from './pages/Reservations';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="members" element={<Members />} />
           <Route path="memberships" element={<Memberships />} />
           <Route path="classes" element={<Classes />} />
+          <Route path="schedules" element={<Schedules />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="settings" element={<div>Settings Page (Coming Soon)</div>} />
           <Route path="*" element={<Navigate to="/" replace />} />

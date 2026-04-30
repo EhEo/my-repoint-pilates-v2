@@ -9,6 +9,8 @@ import memberRoutes from './routes/members';
 import membershipRoutes from './routes/memberships';
 import classRoutes from './routes/classes';
 import instructorRoutes from './routes/instructors';
+import instructorScheduleRoutes from './routes/instructor-schedules';
+import instructorLeaveRoutes from './routes/instructor-leaves';
 import reservationRoutes from './routes/reservations';
 import dashboardRoutes from './routes/dashboard';
 
@@ -29,6 +31,8 @@ app.use('/api/members', adminOnly, memberRoutes);
 app.use('/api/memberships', adminOnly, membershipRoutes);
 app.use('/api/classes', adminOnly, classRoutes);
 app.use('/api/instructors', adminOnly, instructorRoutes);
+app.use('/api/instructor-schedules', adminOnly, instructorScheduleRoutes);
+app.use('/api/instructor-leaves', adminOnly, instructorLeaveRoutes);
 app.use('/api/reservations', adminOnly, reservationRoutes);
 app.use('/api/dashboard', adminOnly, dashboardRoutes);
 

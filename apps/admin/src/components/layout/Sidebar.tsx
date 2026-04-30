@@ -3,6 +3,7 @@ import {
     LayoutDashboard,
     Users,
     Calendar,
+    CalendarClock,
     Settings,
     Dumbbell,
     Ticket
@@ -15,6 +16,7 @@ const Sidebar = () => {
         { icon: Users, label: 'Members', path: '/members' },
         { icon: Ticket, label: 'Memberships', path: '/memberships' },
         { icon: Calendar, label: 'Classes & Schedule', path: '/classes' },
+        { icon: CalendarClock, label: 'Instructor Schedules', path: '/schedules' },
         { icon: Dumbbell, label: 'Reservations', path: '/reservations' },
         { icon: Settings, label: 'Settings', path: '/settings' },
     ];
