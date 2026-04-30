@@ -73,6 +73,8 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 **강사 스케줄/휴무 (Phase 5B).** 강사별 반복 가용 시간은 `InstructorSchedule { dayOfWeek (0=Sun..6=Sat), startTime "HH:mm", endTime "HH:mm" }` (instructor당 다수 슬롯). 휴무는 `InstructorLeave { startDate, endDate, reason? }` 로 일자 범위 override. **현재 ClassSession 생성 시점에 가용성을 강제 검사하지 않는다** — 데이터만 노출하고 스케줄 충돌 정책은 admin 판단에 맡김. 대강(substitution) 워크플로우는 미도입. Instructor 삭제 시 schedules/leaves 는 cascade 삭제. 어드민 [/schedules](apps/admin/src/pages/Schedules.tsx) 페이지에서 강사 picker로 골라 인라인 추가/삭제.
 
+**매출 시계열 (Phase 5D).** [`GET /api/dashboard/revenue?granularity=DAY|WEEK|MONTH|YEAR`](apps/api/src/routes/dashboard.ts) 가 cash-flow 관점의 시계열을 반환 — `paidAt` 기준 +gross, `refundedAt` 기준 +refunds, net = gross − refunds. 결측 버킷은 0 으로 채워 x-축 연속성을 보장하고 WEEK 는 ISO(월요일) 기준. **금액은 mock**: `Membership.totalCount × SESSION_UNIT_PRICE` ([apps/api/src/lib/pricing.ts](apps/api/src/lib/pricing.ts), 50,000 KRW) — Payment 모델이 도입되면 이 곱셈은 사라지고 `Payment.amount` 합산으로 바뀌어야 함. 어드민 [RevenueChart](apps/admin/src/components/Dashboard/RevenueChart.tsx) 가 4단위 selector + KRW 축약 포맷(`만`/`억`)으로 렌더링.
+
 **랜딩 페이지.** [apps/landing](apps/landing)은 빌드 단계 없는 vanilla HTML/CSS/JS다. [apps/landing/index.html](apps/landing/index.html) 단일 파일이 거의 모든 콘텐츠를 담고 있고, [service-worker.js](apps/landing/service-worker.js)가 PWA 오프라인 캐시를 담당한다. 어드민과 무관하게 단독 호스팅 가능 (정적 호스팅 대상).
 
 ## 알아두면 좋은 컨벤션

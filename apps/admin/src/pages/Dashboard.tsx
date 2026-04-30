@@ -3,7 +3,6 @@ import { Users, Calendar, DollarSign, TrendingUp, Bell, Clock } from 'lucide-rea
 import RevenueChart from '../components/Dashboard/RevenueChart';
 import AttendanceChart from '../components/Dashboard/AttendanceChart';
 import { fetchDashboardStats, fetchRecentActivity } from '../utils/api';
-// import { MOCK_DASHBOARD_STATS, MOCK_RECENT_ACTIVITY } from '../utils/mockDashboardData';
 
 const Dashboard = () => {
   const [stats, setStats] = useState<any>({
@@ -71,9 +70,9 @@ const Dashboard = () => {
     },
     {
       label: 'Revenue (Est.)',
-      value: `$${stats.revenue.toLocaleString()}`,
-      change: '+8% from last month',
-      trend: 'positive',
+      value: `₩${(stats.revenue ?? 0).toLocaleString('ko-KR')}`,
+      change: '활성 회원권 합계 기준 (mock)',
+      trend: 'neutral',
       iconType: 'dollar'
     },
     {

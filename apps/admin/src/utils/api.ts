@@ -159,4 +159,15 @@ export const cancelReservation = (id: string) =>
 
 export const fetchDashboardStats = () => request<any>('/api/dashboard/stats');
 export const fetchRecentActivity = () => request<any[]>('/api/dashboard/recent-activity');
+
+export type RevenueGranularity = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
+export interface RevenueSeriesResponse {
+    granularity: RevenueGranularity;
+    from: string;
+    to: string;
+    unitPrice: number;
+    series: { bucket: string; label: string; gross: number; refunds: number; net: number }[];
+}
+export const fetchDashboardRevenue = (granularity: RevenueGranularity = 'MONTH') =>
+    request<RevenueSeriesResponse>(`/api/dashboard/revenue?granularity=${granularity}`);
 /* eslint-enable @typescript-eslint/no-explicit-any */

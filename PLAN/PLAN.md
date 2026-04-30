@@ -161,7 +161,20 @@
 - **신체 평가/운동 처방** (PRD 3.1.4): `Assessment`, `Prescription` 모델 — 항목이 많아 별도 PR
 - ✅ **강사 스케줄/휴무** (PRD 3.5.2): `InstructorSchedule`, `InstructorLeave` 모델 — Phase 5B 로 분리 완료. 대강 신청/승인 워크플로우는 별도 단계로 미룸
 - **알림 시스템** (PRD 3.7): `Notification` 큐 모델 + 채널 어댑터(이메일/SMS/카카오 알림톡은 스텁)
-- **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts`에 일/주/월/년 매출 집계
+- ✅ **대시보드 매출 위젯 확장** (PRD 3.8): `dashboard.ts` 에 일/주/월/년 매출 집계 — Phase 5D 로 분리 완료
+
+#### ✅ Integration Phase 5D — 대시보드 매출 위젯 확장 — 완료
+
+- [x] [GET /api/dashboard/revenue?granularity=DAY|WEEK|MONTH|YEAR](../apps/api/src/routes/dashboard.ts) — 시계열 버킷팅 (cash-flow 관점: paidAt 기준 +gross, refundedAt 기준 +refunds, net = gross - refunds)
+- [x] 기본 윈도우: DAY=30일, WEEK=12주, MONTH=12개월, YEAR=5년. `from`/`to` 쿼리로 override 가능
+- [x] 결측 버킷은 0 으로 채워 x-축 연속성 보장. 주 단위는 ISO(월요일) 기준
+- [x] 단가 상수를 [lib/pricing.ts](../apps/api/src/lib/pricing.ts) 로 추출 (Payment 도입 시 제거 예정)
+- [x] [RevenueChart](../apps/admin/src/components/Dashboard/RevenueChart.tsx) 를 mock 에서 실 API 로 전환 — Day/Week/Month/Year 탭 selector, KRW 축약 포맷터(`만`/`억`), tooltip 에 gross/refunds/net 분해, 빈 상태/로딩 처리
+- [x] Dashboard stat 카드의 매출 표시를 `$` 에서 `₩` 로 교체
+- [x] mockDashboardData 의 무효 항목(MOCK_REVENUE_DATA, MOCK_DASHBOARD_STATS, MOCK_RECENT_ACTIVITY) 제거. AttendanceChart 가 쓰는 MOCK_ATTENDANCE_DATA 만 보존 (Phase 6 일괄 정리)
+- [x] 검증: `npm run build:admin && npm run build:api` exit 0
+
+**비-범위**: 회원 분석/수업 분석/강사 실적/예약률 리포트 (PRD 3.8.2 의 다른 항목들). Payment 모델 도입 후 매출 단가가 진짜 데이터로 바뀌면 이 엔드포인트의 unitPrice 곱셈도 자연스럽게 사라진다.
 
 #### ✅ Integration Phase 5B — 강사 스케줄/휴무 — 완료
 
@@ -195,5 +208,6 @@
 | Integration Phase 3 — Membership 테이블 분리 | ✅ 완료 | 횟수권 단일활성, endDate 수정 가능, 예약 트랜잭션화 |
 | Integration Phase 4 (mini) — 결제 플래그 | ✅ 완료 | Membership 에 paid/paidAt/refundedAt/paymentNote 수기 토글. 본격 Payment 모델은 보류 |
 | Integration Phase 5B — 강사 스케줄/휴무 | ✅ 완료 | InstructorSchedule + InstructorLeave + /schedules 페이지. 대강 워크플로우 미도입 |
-| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 / 알림 / 대시보드 확장 |
+| Integration Phase 5D — 대시보드 매출 위젯 | ✅ 완료 | /api/dashboard/revenue 시계열, RevenueChart 실 데이터 + D/W/M/Y selector |
+| Integration Phase 5 — 나머지 부가 기능 | ⬜ 예정 | 신체평가 / 알림 |
 | Integration Phase 6 — 정리 | ⬜ 예정 | mock 제거, enum 일관성, Pilates 레포 archived |
