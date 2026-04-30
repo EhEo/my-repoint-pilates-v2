@@ -1,11 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// import { PrismaClient } from '@prisma/client'; // Not needed
 import prisma from './lib/prisma';
+import { requireAuth, requireRole } from './middleware/requireAuth';
 
+import authRoutes from './routes/auth';
 import memberRoutes from './routes/members';
 import classRoutes from './routes/classes';
+import instructorRoutes from './routes/instructors';
+import reservationRoutes from './routes/reservations';
+import dashboardRoutes from './routes/dashboard';
 
 dotenv.config();
 
@@ -15,11 +19,16 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/members', memberRoutes);
-app.use('/api/classes', classRoutes);
-app.use('/api/instructors', require('./routes/instructors').default);
-app.use('/api/reservations', require('./routes/reservations').default);
-app.use('/api/dashboard', require('./routes/dashboard').default);
+// Public
+app.use('/api/auth', authRoutes);
+
+// Admin-only (Phase 2 — every existing /api/* route now requires ADMIN)
+const adminOnly = [requireAuth, requireRole('ADMIN')];
+app.use('/api/members', adminOnly, memberRoutes);
+app.use('/api/classes', adminOnly, classRoutes);
+app.use('/api/instructors', adminOnly, instructorRoutes);
+app.use('/api/reservations', adminOnly, reservationRoutes);
+app.use('/api/dashboard', adminOnly, dashboardRoutes);
 
 app.get('/', (req, res) => {
     res.send('Pilates System API is running');
@@ -29,7 +38,6 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-// Handle generic cleanup
 process.on('SIGTERM', async () => {
     await prisma.$disconnect();
     process.exit(0);

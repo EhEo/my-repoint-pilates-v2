@@ -55,7 +55,9 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 ## 아키텍처 메모
 
-**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/members`, `/api/classes`, `/api/instructors`, `/api/reservations`, `/api/dashboard`. 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)에서 호출하며 `VITE_API_URL`(기본 `http://localhost:3000`)을 읽는다. Phase 2 이후 인증이 도입되면 모든 라우트에 `requireAuth + requireRole('ADMIN')` 미들웨어가 붙는다.
+**API 엔드포인트.** 모든 라우트는 [apps/api/src/index.ts](apps/api/src/index.ts)에서 `/api` 하위에 마운트: `/api/auth`(공개), 그리고 `/api/members`, `/api/classes`, `/api/instructors`, `/api/reservations`, `/api/dashboard`(전부 `[requireAuth, requireRole('ADMIN')]` 적용 — Phase 2). 어드민은 [apps/admin/src/utils/api.ts](apps/admin/src/utils/api.ts)의 공통 `request<T>()` 헬퍼로 호출하며, 토큰은 [apps/admin/src/utils/auth.ts](apps/admin/src/utils/auth.ts)에서 `localStorage`로 관리하고 401이 떨어지면 자동으로 세션을 비우고 `/login`으로 보낸다. `VITE_API_URL` 기본값은 `http://localhost:3000`.
+
+**인증.** JWT(`HS256`, 기본 만료 `7d`). 시드 ([apps/api/prisma/seed.ts](apps/api/prisma/seed.ts))가 `.env`의 `ADMIN_EMAIL`/`ADMIN_PASSWORD`로 admin User를 upsert하고, 시드는 도메인 데이터(`Reservation`/`ClassSession`/`Member`/`Instructor`)만 비우며 **`User` 테이블은 보존한다**. `prisma:seed` 스크립트는 `ts-node prisma/seed.ts` 단일 소스 — 손수 컴파일된 `seed.js`는 더 이상 존재하지 않음. [seed-api.js](apps/api/seed-api.js)도 admin 로그인 후 `Authorization: Bearer ...`로 호출. 환경변수는 [apps/api/.env.example](apps/api/.env.example) 참고, 실값은 gitignored `.env`. 미들웨어는 [apps/api/src/middleware/requireAuth.ts](apps/api/src/middleware/requireAuth.ts)에서 `req.user: JwtPayload`를 attach.
 
 **예약 불변식.** [apps/api/src/routes/reservations.ts](apps/api/src/routes/reservations.ts)에서 예약 생성/취소 시 `ClassSession.enrolled`와 `Member.remainingSessions`를 함께 갱신한다. 이 세 가지 업데이트는 **트랜잭션 안에 있지 않다** — Phase 3에서 `prisma.$transaction`으로 감싸고, `Membership` 별도 테이블이 도입되면 잔여 횟수 차감 대상도 함께 변경 예정. 정원 체크는 아직 단순화되어 있다.
 
@@ -65,7 +67,7 @@ Docker 풀스택 — 루트에서 `docker-compose up`. landing(`:3001`), admin(`
 
 **스타일링.** CSS 프레임워크 없음. 디자인 토큰은 [apps/admin/src/styles/variables.css](apps/admin/src/styles/variables.css)의 CSS custom property로 정의 (HSL 3쌍을 `hsl(var(--color-*))`로 소비, `--space-*`, `--radius-*`, `--shadow-*`). 컴포넌트는 인라인 `<style>`이나 글로벌 클래스명을 사용. `.dark` 토큰 오버라이드는 정의되어 있지만 테마 토글 UI는 미연결.
 
-**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/classes`, `/reservations` 페이지가 마운트. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트. Phase 2에서 `/login`과 `RequireAuth` 추가 예정.
+**라우팅.** `Sidebar` + `Header` + `<Outlet />` 구성의 단일 `MainLayout` 쉘 아래 `/`, `/members`, `/classes`, `/reservations` 페이지가 마운트. 전체 쉘은 [RequireAuth](apps/admin/src/components/auth/RequireAuth.tsx)로 감싸고, 공개 `/login`만 그 바깥. `/settings`는 플레이스홀더, 매칭되지 않는 경로는 `/`로 리다이렉트.
 
 **랜딩 페이지.** [apps/landing](apps/landing)은 빌드 단계 없는 vanilla HTML/CSS/JS다. [apps/landing/index.html](apps/landing/index.html) 단일 파일이 거의 모든 콘텐츠를 담고 있고, [service-worker.js](apps/landing/service-worker.js)가 PWA 오프라인 캐시를 담당한다. 어드민과 무관하게 단독 호스팅 가능 (정적 호스팅 대상).
 

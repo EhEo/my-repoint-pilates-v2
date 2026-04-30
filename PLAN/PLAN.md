@@ -106,14 +106,21 @@
 - [x] 검증: `npm run build:admin && npm run build:api` 각각 exit code 0
 - 작은 단위 커밋 1건으로 처리
 
-### Integration Phase 2 — JWT 인증 도입
-- Pilates의 NestJS auth (`@Inject` + Passport + Guard)를 Express 미들웨어로 단순 포팅
-- 추가 의존성: `bcryptjs`, `jsonwebtoken`, `@types/jsonwebtoken`
-- Prisma 추가: `User { id email password role createdAt updatedAt }` + `enum Role { ADMIN INSTRUCTOR MEMBER }`
-- 신규 라우트: `POST /api/auth/login`, `GET /api/auth/me`
-- 기존 `/api/*` 라우트에 `requireAuth + requireRole('ADMIN')` 미들웨어 적용
-- 어드민 SPA: `/login` 페이지 + `RequireAuth` 래퍼 + `localStorage` JWT
-- 시드 스크립트에 `ADMIN_EMAIL`/`ADMIN_PASSWORD`로 admin 계정 upsert 추가
+### ✅ Integration Phase 2 — JWT 인증 도입 — 완료
+
+- [x] Pilates의 NestJS auth를 Express 미들웨어로 포팅 ([apps/api/src/middleware/requireAuth.ts](../apps/api/src/middleware/requireAuth.ts))
+- [x] 의존성 추가: `bcryptjs`, `jsonwebtoken`, `@types/bcryptjs`, `@types/jsonwebtoken`
+- [x] Prisma 스키마: `User { id email password role createdAt updatedAt }` + `enum Role { ADMIN INSTRUCTOR MEMBER }`
+- [x] JWT 헬퍼 ([apps/api/src/lib/auth.ts](../apps/api/src/lib/auth.ts)) — `signToken/verifyToken/hashPassword/verifyPassword`
+- [x] 신규 라우트: `POST /api/auth/login`, `GET /api/auth/me` ([apps/api/src/routes/auth.ts](../apps/api/src/routes/auth.ts))
+- [x] 기존 `/api/{members,classes,instructors,reservations,dashboard}` 전부에 `[requireAuth, requireRole('ADMIN')]` 일괄 적용 ([apps/api/src/index.ts](../apps/api/src/index.ts))
+- [x] 어드민 SPA: `/login` 페이지 + `RequireAuth` 래퍼 + Header 로그아웃 + 401 시 자동 로그인 리다이렉트 + `localStorage` JWT
+- [x] [apps/api/prisma/seed.ts](../apps/api/prisma/seed.ts)에 `ADMIN_EMAIL`/`ADMIN_PASSWORD` upsert 추가 (User 테이블은 보존)
+- [x] [apps/api/seed-api.js](../apps/api/seed-api.js)는 admin 로그인 후 모든 호출에 `Authorization: Bearer ...` 주입
+- [x] `prisma:seed` 스크립트를 `ts-node prisma/seed.ts`로 단일화 (수기 컴파일된 `seed.js` 제거)
+- [x] [.env](../apps/api/.env)에 임시 `JWT_SECRET`/`ADMIN_*` 채움 + [.env.example](../apps/api/.env.example) 추가
+- [x] Dockerfile CMD에 `npm run prisma:seed` 추가, docker-compose `api` 서비스에 `env_file` 연결
+- [x] 검증: `npm run build:admin && npm run build:api` 모두 exit 0
 
 ### Integration Phase 3 — Prisma 스키마: 회원권 분리 (PRD 3.2)
 - 기존 `Member.remainingSessions/totalSessions/membershipType` 컬럼은 제거
@@ -157,7 +164,7 @@
 | --- | --- | --- |
 | Integration Phase 1 — Monorepo 재편성 | ✅ 완료 | `feature/integrate-landing-and-auth` 브랜치, 커밋 완료 |
 | Integration Phase 1.5 — 기존 빌드 에러 정리 | ✅ 완료 | admin/api 빌드 green |
-| Integration Phase 2 — JWT 인증 도입 | ⬜ 예정 | Pilates의 NestJS auth → Express 미들웨어 포팅 |
+| Integration Phase 2 — JWT 인증 도입 | ✅ 완료 | bcrypt + jsonwebtoken, /api/* 전부 ADMIN-only, /login 페이지 |
 | Integration Phase 3 — Membership 테이블 분리 | ⬜ 예정 | PRD 3.2, 결제 확장 대비 |
 | Integration Phase 4 — Payment 모델 | ⬜ 예정 | PRD 3.6 |
 | Integration Phase 5 — 부가 기능 | ⬜ 예정 | 신체평가/강사스케줄/알림/대시보드 확장 |

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
@@ -8,7 +9,23 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('Start seeding ...');
 
-    // Clean up existing data
+    // Upsert admin user from env (idempotent — safe to re-run)
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) {
+        throw new Error(
+            'ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env to seed the admin user.'
+        );
+    }
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    const admin = await prisma.user.upsert({
+        where: { email: adminEmail },
+        update: { password: passwordHash, role: 'ADMIN' },
+        create: { email: adminEmail, password: passwordHash, role: 'ADMIN' },
+    });
+    console.log('Upserted admin user:', admin.email);
+
+    // Clean up existing domain data (does NOT touch User table)
     await prisma.reservation.deleteMany();
     await prisma.classSession.deleteMany();
     await prisma.member.deleteMany();

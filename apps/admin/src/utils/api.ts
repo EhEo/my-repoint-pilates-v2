@@ -1,117 +1,93 @@
+import { clearSession, getToken, setSession, type AuthUser } from './auth';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export async function fetchMembers() {
-    const response = await fetch(`${API_URL}/api/members`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch members');
-    }
-    return response.json();
+interface RequestOptions {
+    method?: string;
+    body?: unknown;
+    skipAuth?: boolean;
 }
 
-export async function createMember(data: any) {
-    const response = await fetch(`${API_URL}/api/members`, {
+async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+
+    if (!opts.skipAuth) {
+        const token = getToken();
+        if (token) headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}${path}`, {
+        method: opts.method ?? 'GET',
+        headers,
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    });
+
+    if (response.status === 401 && !opts.skipAuth) {
+        // Token rejected — wipe session and bounce to login
+        clearSession();
+        if (typeof window !== 'undefined' && !window.location.pathname.endsWith('/login')) {
+            window.location.href = '/login';
+        }
+    }
+
+    if (!response.ok) {
+        let message = `${opts.method ?? 'GET'} ${path} failed (${response.status})`;
+        try {
+            const body = await response.json();
+            if (body?.error) message = body.error;
+        } catch {
+            // ignore JSON parse failures
+        }
+        throw new Error(message);
+    }
+
+    return response.json() as Promise<T>;
+}
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+export interface LoginResponse {
+    token: string;
+    user: AuthUser;
+}
+
+export async function login(email: string, password: string): Promise<LoginResponse> {
+    const data = await request<LoginResponse>('/api/auth/login', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: { email, password },
+        skipAuth: true,
     });
-    if (!response.ok) {
-        throw new Error('Failed to create member');
-    }
-    return response.json();
+    setSession(data.token, data.user);
+    return data;
 }
 
-export async function fetchClasses(date?: string) {
-    const url = date ? `${API_URL}/api/classes?date=${date}` : `${API_URL}/api/classes`;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Failed to fetch classes');
-    }
-    return response.json();
+export async function fetchMe(): Promise<AuthUser> {
+    return request<AuthUser>('/api/auth/me');
 }
 
-export async function createClass(data: any) {
-    const response = await fetch(`${API_URL}/api/classes`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        throw new Error('Failed to create class');
-    }
-    return response.json();
-}
+// ── Members / Classes / Instructors / Reservations / Dashboard ─────────────
+// Returns are intentionally `any` for now — call sites carry their own types.
+// Phase 6 / packages/shared 도입 시 단일 타입으로 정리 예정.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const fetchMembers = () => request<any[]>('/api/members');
+export const createMember = (data: any) =>
+    request<any>('/api/members', { method: 'POST', body: data });
 
-export async function fetchInstructors() {
-    const response = await fetch(`${API_URL}/api/instructors`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch instructors');
-    }
-    return response.json();
-}
+export const fetchClasses = (date?: string) =>
+    request<any[]>(date ? `/api/classes?date=${date}` : '/api/classes');
+export const createClass = (data: any) =>
+    request<any>('/api/classes', { method: 'POST', body: data });
 
-export async function createInstructor(data: any) {
-    const response = await fetch(`${API_URL}/api/instructors`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        throw new Error('Failed to create instructor');
-    }
-    return response.json();
-}
+export const fetchInstructors = () => request<any[]>('/api/instructors');
+export const createInstructor = (data: any) =>
+    request<any>('/api/instructors', { method: 'POST', body: data });
 
-export async function fetchReservations() {
-    const response = await fetch(`${API_URL}/api/reservations`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch reservations');
-    }
-    return response.json();
-}
+export const fetchReservations = () => request<any[]>('/api/reservations');
+export const createReservation = (data: { memberId: string; classSessionId: string }) =>
+    request<any>('/api/reservations', { method: 'POST', body: data });
+export const cancelReservation = (id: string) =>
+    request<any>(`/api/reservations/${id}/cancel`, { method: 'PATCH' });
 
-export async function createReservation(data: { memberId: string; classSessionId: string }) {
-    const response = await fetch(`${API_URL}/api/reservations`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to create reservation');
-    }
-    return response.json();
-}
-
-export async function cancelReservation(id: string) {
-    const response = await fetch(`${API_URL}/api/reservations/${id}/cancel`, {
-        method: 'PATCH',
-    });
-    if (!response.ok) {
-        throw new Error('Failed to cancel reservation');
-    }
-    return response.json();
-}
-
-export async function fetchDashboardStats() {
-    const response = await fetch(`${API_URL}/api/dashboard/stats`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch dashboard stats');
-    }
-    return response.json();
-}
-
-export async function fetchRecentActivity() {
-    const response = await fetch(`${API_URL}/api/dashboard/recent-activity`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch recent activity');
-    }
-    return response.json();
-}
+export const fetchDashboardStats = () => request<any>('/api/dashboard/stats');
+export const fetchRecentActivity = () => request<any[]>('/api/dashboard/recent-activity');
+/* eslint-enable @typescript-eslint/no-explicit-any */

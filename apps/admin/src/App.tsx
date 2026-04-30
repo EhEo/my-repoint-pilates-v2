@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
+import RequireAuth from './components/auth/RequireAuth';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
 import Classes from './pages/Classes';
@@ -9,7 +11,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <MainLayout />
+            </RequireAuth>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="members" element={<Members />} />
           <Route path="classes" element={<Classes />} />
