@@ -1,0 +1,422 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "add": "Add",
+        "close": "Close",
+        "loading": "Loading…",
+        "saving": "Saving…",
+        "submitting": "Submitting…",
+        "search": "Search",
+        "yes": "Yes",
+        "no": "No",
+        "all": "All",
+        "none": "None",
+        "from": "From",
+        "to": "To",
+        "date": "Date",
+        "time": "Time",
+        "type": "Type",
+        "status": "Status",
+        "actions": "Actions",
+        "notes": "Notes",
+        "today": "Today"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "members": "Members",
+        "assessments": "Assessments",
+        "memberships": "Memberships",
+        "classes": "Classes & Schedule",
+        "schedules": "Instructor Schedules",
+        "reservations": "Reservations",
+        "notifications": "Notifications",
+        "settings": "Settings",
+        "signOut": "Sign out",
+        "language": "Language"
+    },
+    "auth": {
+        "title": "Repoint Admin",
+        "subtitle": "Sign in with your admin account.",
+        "email": "Email",
+        "password": "Password",
+        "signIn": "Sign in",
+        "signingIn": "Signing in…",
+        "loginFailed": "Login failed."
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "Welcome back, Admin. Here's what's happening today.",
+        "downloadReport": "Download Report",
+        "stats": {
+            "totalMembers": "Total Members",
+            "classesToday": "Classes Today",
+            "revenue": "Revenue (Est.)",
+            "pendingRequests": "Pending Requests"
+        },
+        "trends": {
+            "totalMembersChange": "+12% from last month",
+            "classesScheduled": "{{count}} scheduled",
+            "revenueNote": "Sum of active memberships (mock)",
+            "pendingNeedAction": "{{count}} items need action",
+            "noPending": "Nothing pending"
+        },
+        "recentActivity": "Recent Activity",
+        "viewAll": "View All",
+        "noActivity": "No recent activity.",
+        "loading": "Loading dashboard..."
+    },
+    "charts": {
+        "revenue": "Revenue",
+        "weeklyAttendance": "Weekly Attendance by Type",
+        "granularity": {
+            "DAY": "Day",
+            "WEEK": "Week",
+            "MONTH": "Month",
+            "YEAR": "Year"
+        },
+        "labels": {
+            "net": "Net",
+            "gross": "Gross",
+            "refunds": "Refunds",
+            "weight": "Weight (kg)",
+            "bmi": "BMI",
+            "bodyFat": "Body Fat (%)",
+            "group": "Group",
+            "private": "Private"
+        },
+        "noPaidRevenue": "No paid memberships yet — nothing to chart."
+    },
+    "members": {
+        "title": "Members",
+        "subtitle": "Manage your client base and memberships.",
+        "addMember": "Add Member",
+        "registerNew": "Register New Member",
+        "registerInstructorButton": "Register Member",
+        "searchPlaceholder": "Search by name or email...",
+        "filter": {
+            "allStatus": "All Status",
+            "active": "Active",
+            "inactive": "Inactive",
+            "paused": "Paused"
+        },
+        "loading": "Loading members...",
+        "empty": "No members found.",
+        "card": {
+            "sessions": "Sessions",
+            "noActiveMembership": "No active membership",
+            "expires": "Expires",
+            "lastVisit": "Last Visit",
+            "never": "Never",
+            "viewProfile": "View Profile",
+            "actions": "Member actions"
+        },
+        "form": {
+            "name": "Full Name",
+            "namePlaceholder": "e.g. Jane Doe",
+            "phone": "Phone Number",
+            "phonePlaceholder": "010-0000-0000",
+            "email": "Email",
+            "emailPlaceholder": "jane@example.com",
+            "status": "Status",
+            "notes": "Notes",
+            "notesPlaceholder": "Health notes or special requirements...",
+            "membershipHint": "Memberships are issued from the Memberships page after registering the member.",
+            "submit": "Register Member",
+            "registerFailed": "Failed to register member."
+        },
+        "status": {
+            "ACTIVE": "Active",
+            "INACTIVE": "Inactive",
+            "PAUSED": "Paused"
+        }
+    },
+    "memberships": {
+        "title": "Memberships",
+        "subtitle": "Issue and manage session passes. Expiry dates are editable at any time.",
+        "issueButton": "Issue Membership",
+        "issueModalTitle": "Issue Membership",
+        "issueHint": "Any existing active membership will be auto-cancelled when a new one is issued.",
+        "tabs": {
+            "active": "Active",
+            "all": "All"
+        },
+        "table": {
+            "member": "Member",
+            "remaining": "Remaining",
+            "total": "Total",
+            "start": "Start",
+            "expires": "Expires",
+            "status": "Status",
+            "payment": "Payment",
+            "edit": "Edit"
+        },
+        "form": {
+            "memberLabel": "Member *",
+            "memberPlaceholder": "Select member…",
+            "totalCount": "Total Sessions *",
+            "expiryDate": "Expiry Date *",
+            "issuing": "Issuing…",
+            "issue": "Issue",
+            "issueFailed": "Failed to issue membership."
+        },
+        "edit": {
+            "title": "Edit Membership",
+            "intro": "Edit membership for {{name}}.",
+            "expiryLegend": "Expiry",
+            "expiryDate": "Expiry Date",
+            "paymentLegend": "Payment (manual)",
+            "paymentHint": "Payment is tracked manually until a real payment system is integrated.",
+            "paid": "Paid",
+            "paidDate": "Paid Date",
+            "markPaidToday": "Mark paid today",
+            "refundLegend": "Refund (manual)",
+            "refundedDate": "Refunded Date",
+            "refundHint": "When refunding, decide separately whether to set Status to CANCELLED.",
+            "markRefundedToday": "Mark refunded today",
+            "noteLegend": "Note",
+            "noteLabel": "Payment / refund note",
+            "notePlaceholder": "Payment method, refund reason...",
+            "saveFailed": "Failed to save membership."
+        },
+        "paymentBadge": {
+            "paid": "Paid",
+            "unpaid": "Unpaid",
+            "refunded": "Refunded {{date}}"
+        },
+        "status": {
+            "ACTIVE": "Active",
+            "EXPIRED": "Expired",
+            "CANCELLED": "Cancelled"
+        },
+        "loading": "Loading memberships…",
+        "empty": "No memberships found."
+    },
+    "assessments": {
+        "title": "Body Assessments",
+        "subtitle": "Track per-member measurements and trends. Minimal scope — height/weight/BMI/body-fat/muscle only; posture, flexibility, prescriptions, and photos are out of scope.",
+        "memberLabel": "Member",
+        "noMembers": "— No members —",
+        "trend": {
+            "title": "Trend",
+            "hint": "Weight (kg) · BMI · Body Fat (%)",
+            "empty": "No records or no numeric data yet."
+        },
+        "add": {
+            "title": "Add Measurement",
+            "hint": "BMI is auto-computed when both height and weight are present.",
+            "date": "Date",
+            "height": "Height (cm)",
+            "weight": "Weight (kg)",
+            "bodyFat": "Body Fat (%)",
+            "muscle": "Muscle Mass (kg)",
+            "notes": "Notes",
+            "notesPlaceholder": "Pain points, special notes...",
+            "submit": "Add measurement",
+            "submitting": "Saving…",
+            "createFailed": "Failed to add measurement."
+        },
+        "history": {
+            "title": "History",
+            "table": {
+                "date": "Date",
+                "height": "Height",
+                "weight": "Weight",
+                "bmi": "BMI",
+                "bodyFat": "Body Fat",
+                "muscle": "Muscle",
+                "notes": "Notes"
+            },
+            "deleteConfirm": "Delete this measurement?",
+            "empty": "No records."
+        },
+        "loading": "Loading…"
+    },
+    "schedules": {
+        "title": "Instructor Schedules",
+        "subtitle": "Manage instructor weekly availability and leaves.",
+        "instructorLabel": "Instructor",
+        "noInstructors": "— No instructors —",
+        "weekly": {
+            "title": "Weekly Availability",
+            "hint": "Recurring weekly time slots.",
+            "empty": "No availability set.",
+            "table": {
+                "day": "Day",
+                "start": "Start",
+                "end": "End"
+            },
+            "addFailed": "Failed to add slot.",
+            "deleteConfirm": "Delete this slot?",
+            "deleteAria": "Delete slot"
+        },
+        "leaves": {
+            "title": "Leaves",
+            "hint": "Date-range overrides on top of weekly availability.",
+            "empty": "No leaves.",
+            "reasonPlaceholder": "Reason (optional)",
+            "table": {
+                "from": "From",
+                "to": "To",
+                "reason": "Reason"
+            },
+            "addFailed": "Failed to add leave.",
+            "deleteConfirm": "Delete this leave?",
+            "deleteAria": "Delete leave"
+        },
+        "days": {
+            "0": "Sun",
+            "1": "Mon",
+            "2": "Tue",
+            "3": "Wed",
+            "4": "Thu",
+            "5": "Fri",
+            "6": "Sat"
+        },
+        "addButton": "Add",
+        "loading": "Loading…"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "subtitle": "Reservation events publish automatically. Membership-expiry alerts are scanned on demand (until a scheduler is added).",
+        "scanButton": "Scan membership expiries",
+        "scanning": "Scanning…",
+        "scanResult": "{{count}} new expiry notifications published.",
+        "scanFailed": "Scan failed.",
+        "tabs": {
+            "ALL": "All",
+            "SENT": "Sent",
+            "PENDING": "Pending",
+            "FAILED": "Failed"
+        },
+        "table": {
+            "created": "Created",
+            "type": "Type",
+            "recipient": "Recipient",
+            "channel": "Channel",
+            "status": "Status",
+            "title": "Title"
+        },
+        "type": {
+            "RESERVATION_CONFIRMED": "Reservation Confirmed",
+            "RESERVATION_CANCELLED": "Reservation Cancelled",
+            "MEMBERSHIP_EXPIRY": "Membership Expiry"
+        },
+        "recipient": {
+            "MEMBER": "member",
+            "INSTRUCTOR": "instructor",
+            "ADMIN": "admin"
+        },
+        "status": {
+            "PENDING": "Pending",
+            "SENT": "Sent",
+            "FAILED": "Failed"
+        },
+        "deleteConfirm": "Delete this notification?",
+        "deleteAria": "Delete notification",
+        "empty": "No notifications.",
+        "loading": "Loading…"
+    },
+    "reservations": {
+        "title": "My Reservations",
+        "subtitle": "Manage your bookings and view attending history.",
+        "tabs": {
+            "upcoming": "Upcoming",
+            "history": "History"
+        },
+        "loading": "Loading bookings...",
+        "empty": "No {{tab}} reservations found.",
+        "cancelModal": {
+            "title": "Cancel Reservation",
+            "confirmQuestion": "Are you sure you want to cancel this reservation?",
+            "warning": "This action cannot be undone.",
+            "keep": "No, Keep it",
+            "confirm": "Yes, Cancel",
+            "success": "Reservation cancelled successfully!",
+            "failed": "Failed to cancel reservation."
+        },
+        "card": {
+            "cancel": "Cancel",
+            "unknownInstructor": "Unknown Instructor"
+        },
+        "status": {
+            "CONFIRMED": "Confirmed",
+            "WAITLIST": "Waitlist",
+            "CANCELLED": "Cancelled"
+        }
+    },
+    "classes": {
+        "title": "Classes & Schedule",
+        "subtitle": "Manage the weekly schedule and instructor roster.",
+        "tabs": {
+            "schedule": "Weekly Schedule",
+            "instructors": "Instructors"
+        },
+        "addInstructor": "Add Instructor",
+        "registerInstructorTitle": "Register New Instructor",
+        "loadingClasses": "Loading schedule...",
+        "loadingInstructors": "Loading instructors...",
+        "emptyDay": "No classes scheduled for this day.",
+        "scheduleClass": "Schedule Class",
+        "card": {
+            "duration": "{{count}}min",
+            "detail": "Detail",
+            "level": {
+                "beginner": "Beginner",
+                "intermediate": "Intermediate",
+                "advanced": "Advanced",
+                "all": "All"
+            }
+        },
+        "detail": {
+            "title": "Class Details",
+            "private": "1:1 Private Session",
+            "group": "Group Class",
+            "fields": {
+                "date": "Date",
+                "time": "Time",
+                "instructor": "Instructor",
+                "room": "Room"
+            },
+            "attendees": "Attendees ({{enrolled}}/{{capacity}})",
+            "addMember": "Add Member",
+            "noAttendees": "No members registered yet.",
+            "memberLabel": "Member {{n}}",
+            "removeAria": "Remove attendee",
+            "cancelClass": "Cancel Class",
+            "close": "Close"
+        }
+    },
+    "instructors": {
+        "card": {
+            "edit": "Edit",
+            "schedule": "Schedule"
+        },
+        "form": {
+            "name": "Full Name *",
+            "namePlaceholder": "e.g. John Doe",
+            "email": "Email *",
+            "emailPlaceholder": "john@example.com",
+            "specialties": "Specialties (comma separated)",
+            "specialtiesPlaceholder": "e.g. Reformer, Cadillac, Rehab",
+            "status": "Status",
+            "submit": "Register Instructor",
+            "registerFailed": "Failed to register instructor."
+        },
+        "status": {
+            "active": "Active",
+            "inactive": "Inactive",
+            "leave": "On Leave"
+        }
+    },
+    "modal": {
+        "close": "Close modal"
+    },
+    "header": {
+        "searchPlaceholder": "Search members, classes...",
+        "notifications": "Notifications",
+        "signOut": "Sign out"
+    }
+}

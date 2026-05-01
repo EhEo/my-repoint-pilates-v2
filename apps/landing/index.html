@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="RePoint Pilates - 필라테스 센터를 위한 스마트한 회원 관리 및 예약 시스템. 회원 관리, 실시간 예약, 결제, 자동 알림까지 한 곳에서.">
+    <meta name="keywords" content="필라테스, 센터 관리, 예약 시스템, 회원 관리, 피트니스, 스튜디오 관리, RePoint">
+    <meta name="author" content="RePoint">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#4A5D52">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://repoint.kr/">
+    <meta property="og:title" content="RePoint Pilates - 스마트한 필라테스 센터 관리">
+    <meta property="og:description" content="회원 관리부터 예약, 결제까지 하나의 플랫폼에서 우아하게. 첫 달 무료 체험.">
+    <meta property="og:image" content="https://repoint.kr/public/og-image.png">
+    <meta property="og:locale" content="ko_KR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://repoint.kr/">
+    <meta name="twitter:title" content="RePoint Pilates - 스마트한 필라테스 센터 관리">
+    <meta name="twitter:description" content="회원 관리부터 예약, 결제까지 하나의 플랫폼에서 우아하게.">
+    <meta name="twitter:image" content="https://repoint.kr/public/og-image.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RePoint">
+
+    <title>RePoint Pilates - 스마트한 필라테스 센터 관리</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/svg+xml" href="public/icons/favicon.svg">
+    <link rel="apple-touch-icon" href="public/icons/apple-touch-icon.png">
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="src/css/main.css" as="style">
+    <link rel="preload" href="src/js/main.js" as="script">
+
+    <!-- DNS Prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </noscript>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/css/main.css">
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader" role="status" aria-live="polite" aria-label="페이지 로딩 중">
+        <div class="loader__content">
+            <svg class="loader__logo" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                <circle class="loader__circle" cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2"/>
+                <path class="loader__path" d="M30 50 Q50 20 70 50 Q50 80 30 50" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+            <span class="loader__text">RePoint</span>
+        </div>
+    </div>
+
+    <!-- Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">본문으로 건너뛰기</a>
+
+    <!-- Navigation -->
+    <header class="header" id="header" role="banner">
+        <nav class="nav" role="navigation" aria-label="주 메뉴">
+            <a href="#" class="nav__logo" aria-label="RePoint 홈페이지">
+                <svg class="nav__logo-icon" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                    <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 20 Q20 8 28 20 Q20 32 12 20" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+                <span class="nav__logo-text">RePoint</span>
+            </a>
+
+            <ul class="nav__menu" id="nav-menu">
+                <li><a href="#features" class="nav__link">기능</a></li>
+                <li><a href="#benefits" class="nav__link">장점</a></li>
+                <li><a href="#pricing" class="nav__link">요금제</a></li>
+                <li><a href="#contact" class="nav__link">문의</a></li>
+            </ul>
+
+            <div class="nav__actions">
+                <a href="#demo" class="btn btn--ghost">데모 체험</a>
+                <a href="#start" class="btn btn--primary">시작하기</a>
+            </div>
+
+            <button class="nav__toggle" id="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="모바일 메뉴" hidden>
+        <div class="mobile-menu__content">
+            <ul class="mobile-menu__list">
+                <li><a href="#features" class="mobile-menu__link">기능</a></li>
+                <li><a href="#benefits" class="mobile-menu__link">장점</a></li>
+                <li><a href="#pricing" class="mobile-menu__link">요금제</a></li>
+                <li><a href="#contact" class="mobile-menu__link">문의</a></li>
+            </ul>
+            <div class="mobile-menu__actions">
+                <a href="#demo" class="btn btn--ghost btn--full">데모 체험</a>
+                <a href="#start" class="btn btn--primary btn--full">시작하기</a>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero__bg">
+                <div class="hero__shape hero__shape--1"></div>
+                <div class="hero__shape hero__shape--2"></div>
+                <div class="hero__shape hero__shape--3"></div>
+                <div class="hero__grain"></div>
+            </div>
+
+            <div class="hero__content">
+                <div class="hero__badge">
+                    <span class="hero__badge-dot"></span>
+                    필라테스 센터를 위한
+                </div>
+
+                <h1 class="hero__title">
+                    <span class="hero__title-line">균형 잡힌</span>
+                    <span class="hero__title-line hero__title-line--accent">센터 운영의 시작</span>
+                </h1>
+
+                <p class="hero__description">
+                    회원 관리부터 예약, 결제까지<br>
+                    하나의 플랫폼에서 우아하게
+                </p>
+
+                <div class="hero__cta">
+                    <a href="#start" class="btn btn--large btn--primary">
+                        <span>무료로 시작하기</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#demo" class="btn btn--large btn--outline">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+                        </svg>
+                        <span>데모 영상 보기</span>
+                    </a>
+                </div>
+
+                <div class="hero__stats">
+                    <div class="hero__stat">
+                        <span class="hero__stat-number" data-count="150">0</span>
+                        <span class="hero__stat-unit">+</span>
+                        <span class="hero__stat-label">센터 이용중</span>
+                    </div>
+                    <div class="hero__stat-divider"></div>
+                    <div class="hero__stat">
+                        <span class="hero__stat-number" data-count="15000">0</span>
+                        <span class="hero__stat-unit">+</span>
+                        <span class="hero__stat-label">월간 예약</span>
+                    </div>
+                    <div class="hero__stat-divider"></div>
+                    <div class="hero__stat">
+                        <span class="hero__stat-number" data-count="99">0</span>
+                        <span class="hero__stat-unit">%</span>
+                        <span class="hero__stat-label">고객 만족도</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero__visual">
+                <div class="hero__device">
+                    <div class="hero__device-frame">
+                        <div class="hero__device-notch"></div>
+                        <div class="hero__device-screen">
+                            <div class="hero__app">
+                                <div class="hero__app-header">
+                                    <span class="hero__app-greeting">안녕하세요, 박회원님</span>
+                                    <div class="hero__app-avatar"></div>
+                                </div>
+                                <div class="hero__app-card">
+                                    <div class="hero__app-card-header">
+                                        <span>남은 횟수</span>
+                                        <span class="hero__app-card-badge">활성</span>
+                                    </div>
+                                    <div class="hero__app-card-value">15<span>회</span></div>
+                                    <div class="hero__app-card-progress">
+                                        <div class="hero__app-card-bar" style="width: 75%"></div>
+                                    </div>
+                                    <div class="hero__app-card-footer">
+                                        <span>만료일: 2024.03.15</span>
+                                    </div>
+                                </div>
+                                <div class="hero__app-schedule">
+                                    <div class="hero__app-schedule-header">다가오는 수업</div>
+                                    <div class="hero__app-schedule-item">
+                                        <div class="hero__app-schedule-time">
+                                            <span class="hero__app-schedule-day">금</span>
+                                            <span class="hero__app-schedule-hour">19:00</span>
+                                        </div>
+                                        <div class="hero__app-schedule-info">
+                                            <span class="hero__app-schedule-title">개인 리포머</span>
+                                            <span class="hero__app-schedule-instructor">이필라 강사</span>
+                                        </div>
+                                        <button class="hero__app-schedule-btn">취소</button>
+                                    </div>
+                                </div>
+                                <button class="hero__app-cta">+ 새 예약하기</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero__device-reflection"></div>
+                </div>
+
+                <!-- Floating Elements -->
+                <div class="hero__float hero__float--1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2v20M2 12h20"/>
+                        <circle cx="12" cy="12" r="4"/>
+                    </svg>
+                    <span>실시간 예약</span>
+                </div>
+                <div class="hero__float hero__float--2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>회원 관리</span>
+                </div>
+                <div class="hero__float hero__float--3">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>스케줄 관리</span>
+                </div>
+            </div>
+
+            <div class="hero__scroll">
+                <span>스크롤하여 더 알아보기</span>
+                <div class="hero__scroll-indicator">
+                    <div class="hero__scroll-dot"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features" aria-labelledby="features-title">
+            <div class="features__header">
+                <span class="section-label">Features</span>
+                <h2 class="section-title" id="features-title">
+                    센터 운영에 필요한<br>
+                    <em>모든 기능</em>을 한 곳에
+                </h2>
+                <p class="section-description">
+                    복잡한 업무는 RePoint에 맡기고,<br>
+                    회원과의 소중한 시간에 집중하세요.
+                </p>
+            </div>
+
+            <div class="features__grid">
+                <!-- Feature 1: Member Management -->
+                <article class="feature-card feature-card--large">
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <circle cx="24" cy="16" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 42c0-8.837 7.163-16 16-16s16 7.163 16 16" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="38" cy="12" r="6" stroke="currentColor" stroke-width="2"/>
+                            <path d="M44 28c0-4.418-2.686-8-6-8" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">스마트 회원 관리</h3>
+                        <p class="feature-card__description">
+                            회원 정보, 회원권, 출결 이력을 한눈에.
+                            체계적인 회원 관리로 이탈률을 낮추고 재등록률을 높이세요.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>회원 등록 및 상태 관리</li>
+                            <li>회원권 종류별 관리 (횟수권/기간권/혼합권)</li>
+                            <li>신체 평가 및 운동 처방 기록</li>
+                            <li>회원별 메모 및 주의사항</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card__visual">
+                        <div class="feature-card__preview">
+                            <div class="preview-member">
+                                <div class="preview-member__avatar"></div>
+                                <div class="preview-member__info">
+                                    <span class="preview-member__name">박회원</span>
+                                    <span class="preview-member__status">활성</span>
+                                </div>
+                                <div class="preview-member__stats">
+                                    <div class="preview-member__stat">
+                                        <span class="preview-member__stat-value">15</span>
+                                        <span class="preview-member__stat-label">잔여</span>
+                                    </div>
+                                    <div class="preview-member__stat">
+                                        <span class="preview-member__stat-value">32</span>
+                                        <span class="preview-member__stat-label">출석</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Feature 2: Reservation -->
+                <article class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <rect x="6" y="10" width="36" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
+                            <path d="M6 20h36" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 6v8M32 6v8" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="24" cy="32" r="6" stroke="currentColor" stroke-width="2"/>
+                            <path d="M24 29v3l2 2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">실시간 예약 시스템</h3>
+                        <p class="feature-card__description">
+                            회원이 직접 앱에서 예약하고, 자동으로 정리되는 스케줄.
+                            전화 예약의 번거로움에서 벗어나세요.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>모바일 앱 실시간 예약/취소</li>
+                            <li>대기자 자동 전환</li>
+                            <li>예약 정책 커스터마이징</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Feature 3: Class Management -->
+                <article class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <rect x="8" y="8" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="26" y="8" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="8" y="26" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="26" y="26" width="14" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">수업 & 강사 관리</h3>
+                        <p class="feature-card__description">
+                            개인, 듀엣, 그룹 수업을 유연하게 설정하고
+                            강사별 스케줄을 효율적으로 관리하세요.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>다양한 수업 유형 지원</li>
+                            <li>강사 스케줄 및 휴무 관리</li>
+                            <li>수업별 정원 및 난이도 설정</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Feature 4: Physical Assessment -->
+                <article class="feature-card feature-card--accent">
+                    <div class="feature-card__badge">New</div>
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M24 4v40" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 12c0 6.627 5.373 12 12 12s12-5.373 12-12" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 36c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">신체 평가 & 운동 처방</h3>
+                        <p class="feature-card__description">
+                            회원별 신체 측정 데이터를 기록하고,
+                            맞춤형 운동 프로그램을 설계하세요.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>종합 신체 측정 기록</li>
+                            <li>변화 추적 그래프</li>
+                            <li>맞춤 운동 처방 관리</li>
+                            <li>Before/After 비교</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Feature 5: Payment -->
+                <article class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <rect x="4" y="12" width="40" height="28" rx="4" stroke="currentColor" stroke-width="2"/>
+                            <path d="M4 22h40" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 32h8" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="36" cy="32" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">간편 결제</h3>
+                        <p class="feature-card__description">
+                            다양한 결제 수단과 자동 영수증 발행으로
+                            결제 업무를 간소화하세요.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>카드/현금/간편결제</li>
+                            <li>할부 및 환불 처리</li>
+                            <li>자동 영수증 발행</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Feature 6: Notification -->
+                <article class="feature-card">
+                    <div class="feature-card__icon">
+                        <svg viewBox="0 0 48 48" fill="none">
+                            <path d="M24 4c-8.837 0-16 7.163-16 16v12l-4 4v2h40v-2l-4-4V20c0-8.837-7.163-16-16-16z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M20 38c0 2.209 1.791 4 4 4s4-1.791 4-4" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="36" cy="12" r="6" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="feature-card__content">
+                        <h3 class="feature-card__title">자동 알림</h3>
+                        <p class="feature-card__description">
+                            예약 확인, 수업 리마인더, 회원권 만료 알림까지
+                            자동으로 발송됩니다.
+                        </p>
+                        <ul class="feature-card__list">
+                            <li>푸시 알림 / SMS</li>
+                            <li>카카오 알림톡</li>
+                            <li>이메일 알림</li>
+                        </ul>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits" id="benefits" aria-labelledby="benefits-title">
+            <div class="benefits__bg">
+                <div class="benefits__shape benefits__shape--1"></div>
+                <div class="benefits__shape benefits__shape--2"></div>
+            </div>
+
+            <div class="benefits__content">
+                <span class="section-label section-label--light">Benefits</span>
+                <h2 class="section-title section-title--light" id="benefits-title">
+                    왜 <em>RePoint</em>인가요?
+                </h2>
+
+                <div class="benefits__grid">
+                    <div class="benefit-item">
+                        <div class="benefit-item__number">01</div>
+                        <h3 class="benefit-item__title">운영 효율 극대화</h3>
+                        <p class="benefit-item__description">
+                            반복적인 업무를 자동화하여
+                            관리자의 시간을 회원 케어에 집중할 수 있습니다.
+                        </p>
+                        <div class="benefit-item__stat">
+                            <span class="benefit-item__stat-value">70%</span>
+                            <span class="benefit-item__stat-label">업무 시간 절감</span>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-item__number">02</div>
+                        <h3 class="benefit-item__title">노쇼율 감소</h3>
+                        <p class="benefit-item__description">
+                            자동 리마인더와 취소 정책으로
+                            무단 결석을 최소화합니다.
+                        </p>
+                        <div class="benefit-item__stat">
+                            <span class="benefit-item__stat-value">85%</span>
+                            <span class="benefit-item__stat-label">노쇼 감소</span>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-item__number">03</div>
+                        <h3 class="benefit-item__title">회원 만족도 향상</h3>
+                        <p class="benefit-item__description">
+                            편리한 모바일 예약과 체계적인 케어로
+                            회원 재등록률이 높아집니다.
+                        </p>
+                        <div class="benefit-item__stat">
+                            <span class="benefit-item__stat-value">40%</span>
+                            <span class="benefit-item__stat-label">재등록률 증가</span>
+                        </div>
+                    </div>
+
+                    <div class="benefit-item">
+                        <div class="benefit-item__number">04</div>
+                        <h3 class="benefit-item__title">데이터 기반 의사결정</h3>
+                        <p class="benefit-item__description">
+                            매출, 회원, 예약 데이터를 분석하여
+                            더 나은 운영 전략을 세울 수 있습니다.
+                        </p>
+                        <div class="benefit-item__stat">
+                            <span class="benefit-item__stat-value">실시간</span>
+                            <span class="benefit-item__stat-label">대시보드 제공</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section class="users" id="users">
+            <div class="users__header">
+                <span class="section-label">For Everyone</span>
+                <h2 class="section-title">
+                    모두를 위한<br>
+                    <em>맞춤형 인터페이스</em>
+                </h2>
+            </div>
+
+            <div class="users__tabs">
+                <button class="users__tab users__tab--active" data-tab="admin">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                    </svg>
+                    <span>관리자</span>
+                </button>
+                <button class="users__tab" data-tab="instructor">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span>강사</span>
+                </button>
+                <button class="users__tab" data-tab="member">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>회원</span>
+                </button>
+            </div>
+
+            <div class="users__content">
+                <div class="users__panel users__panel--active" data-panel="admin">
+                    <div class="users__panel-info">
+                        <h3 class="users__panel-title">센터 관리자</h3>
+                        <p class="users__panel-description">
+                            센터 전체를 한눈에 파악하고
+                            효율적으로 운영하세요.
+                        </p>
+                        <ul class="users__panel-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                실시간 대시보드로 오늘의 예약 현황 확인
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                매출 및 회원 통계 분석
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                강사 스케줄 및 실적 관리
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                시스템 설정 및 권한 관리
+                            </li>
+                        </ul>
+                        <blockquote class="users__panel-quote">
+                            "하루에 수십 명의 예약을 수기로 관리하다 보니 실수가 잦았어요.
+                            RePoint 도입 후 예약 관리가 훨씬 수월해졌습니다."
+                            <cite>— 김센터장, 센터 운영 10년차</cite>
+                        </blockquote>
+                    </div>
+                    <div class="users__panel-visual">
+                        <div class="users__mockup users__mockup--desktop">
+                            <div class="mockup-desktop">
+                                <div class="mockup-desktop__header">
+                                    <div class="mockup-desktop__dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                </div>
+                                <div class="mockup-desktop__content">
+                                    <div class="mockup-dashboard">
+                                        <div class="mockup-dashboard__sidebar">
+                                            <div class="mockup-dashboard__logo"></div>
+                                            <div class="mockup-dashboard__menu">
+                                                <div class="mockup-dashboard__menu-item mockup-dashboard__menu-item--active"></div>
+                                                <div class="mockup-dashboard__menu-item"></div>
+                                                <div class="mockup-dashboard__menu-item"></div>
+                                                <div class="mockup-dashboard__menu-item"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mockup-dashboard__main">
+                                            <div class="mockup-dashboard__stats">
+                                                <div class="mockup-dashboard__stat-card"></div>
+                                                <div class="mockup-dashboard__stat-card"></div>
+                                                <div class="mockup-dashboard__stat-card"></div>
+                                                <div class="mockup-dashboard__stat-card"></div>
+                                            </div>
+                                            <div class="mockup-dashboard__chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="users__panel" data-panel="instructor">
+                    <div class="users__panel-info">
+                        <h3 class="users__panel-title">강사</h3>
+                        <p class="users__panel-description">
+                            내 스케줄과 회원 정보를
+                            언제 어디서나 확인하세요.
+                        </p>
+                        <ul class="users__panel-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                오늘의 수업 스케줄과 회원 목록 확인
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                회원별 신체 평가 및 처방 기록
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                출결 체크 및 수업 메모
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                휴무 신청 및 대강 관리
+                            </li>
+                        </ul>
+                        <blockquote class="users__panel-quote">
+                            "회원별 진도와 주의사항을 수업 전에 빠르게 확인할 수 있어서
+                            더 좋은 수업을 준비할 수 있게 되었어요."
+                            <cite>— 이필라, 필라테스 강사 5년차</cite>
+                        </blockquote>
+                    </div>
+                    <div class="users__panel-visual">
+                        <div class="users__mockup users__mockup--tablet">
+                            <div class="mockup-tablet">
+                                <div class="mockup-tablet__content">
+                                    <div class="mockup-instructor">
+                                        <div class="mockup-instructor__header">
+                                            <div class="mockup-instructor__title"></div>
+                                            <div class="mockup-instructor__date"></div>
+                                        </div>
+                                        <div class="mockup-instructor__schedule">
+                                            <div class="mockup-instructor__time-slot"></div>
+                                            <div class="mockup-instructor__time-slot mockup-instructor__time-slot--active"></div>
+                                            <div class="mockup-instructor__time-slot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="users__panel" data-panel="member">
+                    <div class="users__panel-info">
+                        <h3 class="users__panel-title">회원</h3>
+                        <p class="users__panel-description">
+                            언제 어디서나 간편하게
+                            예약하고 관리하세요.
+                        </p>
+                        <ul class="users__panel-features">
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                실시간 수업 예약 및 취소
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                회원권 잔여 횟수/기간 확인
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                나의 신체 변화 추적
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                수업 리마인더 알림
+                            </li>
+                        </ul>
+                        <blockquote class="users__panel-quote">
+                            "퇴근 후 시간이 불규칙한데, 앱으로 바로 예약할 수 있어서
+                            전화할 필요가 없어 너무 편해요."
+                            <cite>— 박회원, 직장인</cite>
+                        </blockquote>
+                    </div>
+                    <div class="users__panel-visual">
+                        <div class="users__mockup users__mockup--mobile">
+                            <div class="mockup-mobile">
+                                <div class="mockup-mobile__notch"></div>
+                                <div class="mockup-mobile__content">
+                                    <div class="mockup-member">
+                                        <div class="mockup-member__greeting"></div>
+                                        <div class="mockup-member__card"></div>
+                                        <div class="mockup-member__schedule"></div>
+                                        <div class="mockup-member__cta"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing" id="pricing" aria-labelledby="pricing-title">
+            <div class="pricing__header">
+                <span class="section-label">Pricing</span>
+                <h2 class="section-title" id="pricing-title">
+                    센터 규모에 맞는<br>
+                    <em>합리적인 요금제</em>
+                </h2>
+                <p class="section-description">
+                    첫 달 무료 체험 후 결정하세요.<br>
+                    언제든 플랜을 변경할 수 있습니다.
+                </p>
+            </div>
+
+            <div class="pricing__toggle" role="group" aria-label="결제 주기 선택">
+                <span class="pricing__toggle-label" id="monthly-label">월간</span>
+                <button class="pricing__toggle-switch" id="pricing-toggle" role="switch" aria-checked="false" aria-labelledby="monthly-label yearly-label">
+                    <span class="pricing__toggle-knob"></span>
+                </button>
+                <span class="pricing__toggle-label" id="yearly-label">
+                    연간
+                    <span class="pricing__toggle-badge">2개월 무료</span>
+                </span>
+            </div>
+
+            <div class="pricing__grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-card__header">
+                        <h3 class="pricing-card__name">Starter</h3>
+                        <p class="pricing-card__description">소규모 센터에 적합</p>
+                    </div>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">₩</span>
+                        <span class="pricing-card__amount" data-monthly="49000" data-yearly="39000">49,000</span>
+                        <span class="pricing-card__period">/월</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li>회원 최대 50명</li>
+                        <li>강사 계정 2개</li>
+                        <li>기본 예약 관리</li>
+                        <li>회원 관리</li>
+                        <li>SMS 알림 (월 500건)</li>
+                        <li>이메일 지원</li>
+                    </ul>
+                    <a href="#start" class="btn btn--outline btn--full">시작하기</a>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card pricing-card--popular">
+                    <div class="pricing-card__badge">Most Popular</div>
+                    <div class="pricing-card__header">
+                        <h3 class="pricing-card__name">Professional</h3>
+                        <p class="pricing-card__description">성장하는 센터를 위한</p>
+                    </div>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">₩</span>
+                        <span class="pricing-card__amount" data-monthly="99000" data-yearly="79000">99,000</span>
+                        <span class="pricing-card__period">/월</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li>회원 최대 200명</li>
+                        <li>강사 계정 5개</li>
+                        <li>고급 예약 관리</li>
+                        <li>신체 평가 & 처방</li>
+                        <li>대시보드 & 리포트</li>
+                        <li>SMS/카카오 알림 (월 2,000건)</li>
+                        <li>전화 & 채팅 지원</li>
+                    </ul>
+                    <a href="#start" class="btn btn--primary btn--full">시작하기</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <div class="pricing-card__header">
+                        <h3 class="pricing-card__name">Enterprise</h3>
+                        <p class="pricing-card__description">대형 센터 & 프랜차이즈</p>
+                    </div>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">₩</span>
+                        <span class="pricing-card__amount" data-monthly="199000" data-yearly="159000">199,000</span>
+                        <span class="pricing-card__period">/월</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li>무제한 회원</li>
+                        <li>무제한 강사 계정</li>
+                        <li>멀티 센터 지원</li>
+                        <li>API 연동</li>
+                        <li>맞춤 리포트</li>
+                        <li>무제한 알림</li>
+                        <li>전담 매니저 배정</li>
+                        <li>온사이트 교육</li>
+                    </ul>
+                    <a href="#contact" class="btn btn--outline btn--full">문의하기</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta" id="start">
+            <div class="cta__bg">
+                <div class="cta__shape cta__shape--1"></div>
+                <div class="cta__shape cta__shape--2"></div>
+                <div class="cta__shape cta__shape--3"></div>
+            </div>
+            <div class="cta__content">
+                <h2 class="cta__title">
+                    지금 시작하세요
+                </h2>
+                <p class="cta__description">
+                    첫 달 무료 체험으로 RePoint의 모든 기능을 경험해보세요.<br>
+                    신용카드 없이 바로 시작할 수 있습니다.
+                </p>
+                <form class="cta__form" id="cta-form">
+                    <div class="cta__input-group">
+                        <input type="text" placeholder="센터명" required class="cta__input">
+                        <input type="email" placeholder="이메일 주소" required class="cta__input">
+                        <input type="tel" placeholder="연락처" required class="cta__input">
+                    </div>
+                    <button type="submit" class="btn btn--large btn--accent">
+                        <span>무료 체험 시작하기</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </form>
+                <p class="cta__note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    개인정보는 안전하게 보호됩니다
+                </p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact" id="contact">
+            <div class="contact__content">
+                <div class="contact__info">
+                    <span class="section-label">Contact</span>
+                    <h2 class="section-title">
+                        궁금한 점이<br>
+                        <em>있으신가요?</em>
+                    </h2>
+                    <p class="contact__description">
+                        데모 시연, 맞춤 상담, 기술 문의 등<br>
+                        무엇이든 편하게 연락주세요.
+                    </p>
+                    <div class="contact__methods">
+                        <a href="tel:02-1234-5678" class="contact__method">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                            <span>02-1234-5678</span>
+                        </a>
+                        <a href="mailto:hello@repoint.kr" class="contact__method">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            <span>hello@repoint.kr</span>
+                        </a>
+                        <a href="https://pf.kakao.com/repoint" class="contact__method" target="_blank">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3C6.5 3 2 6.58 2 11c0 2.83 1.82 5.3 4.53 6.72l-.74 2.77c-.07.27.18.5.43.4l3.25-1.4c.82.12 1.66.18 2.53.18 5.5 0 10-3.58 10-8s-4.5-8-10-8z"/>
+                            </svg>
+                            <span>카카오톡 상담</span>
+                        </a>
+                    </div>
+                </div>
+                <form class="contact__form" id="contact-form">
+                    <div class="contact__form-row">
+                        <div class="contact__form-group">
+                            <label for="name">이름</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="contact__form-group">
+                            <label for="center">센터명</label>
+                            <input type="text" id="center" name="center">
+                        </div>
+                    </div>
+                    <div class="contact__form-row">
+                        <div class="contact__form-group">
+                            <label for="email">이메일</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="contact__form-group">
+                            <label for="phone">연락처</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                    </div>
+                    <div class="contact__form-group">
+                        <label for="inquiry">문의 유형</label>
+                        <select id="inquiry" name="inquiry">
+                            <option value="">선택해주세요</option>
+                            <option value="demo">데모 신청</option>
+                            <option value="pricing">요금 문의</option>
+                            <option value="feature">기능 문의</option>
+                            <option value="technical">기술 지원</option>
+                            <option value="partnership">제휴 문의</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="contact__form-group">
+                        <label for="message">메시지</label>
+                        <textarea id="message" name="message" rows="4" placeholder="궁금한 점을 자유롭게 작성해주세요"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full">
+                        <span>문의 보내기</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="footer__top">
+            <div class="footer__brand">
+                <a href="#" class="footer__logo">
+                    <svg class="footer__logo-icon" viewBox="0 0 40 40" fill="none">
+                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 20 Q20 8 28 20 Q20 32 12 20" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    </svg>
+                    <span class="footer__logo-text">RePoint</span>
+                </a>
+                <p class="footer__tagline">
+                    필라테스 센터를 위한<br>
+                    스마트한 운영 파트너
+                </p>
+            </div>
+
+            <div class="footer__links">
+                <div class="footer__column">
+                    <h4 class="footer__column-title">제품</h4>
+                    <ul class="footer__menu">
+                        <li><a href="#features">기능</a></li>
+                        <li><a href="#pricing">요금제</a></li>
+                        <li><a href="#">업데이트</a></li>
+                        <li><a href="#">로드맵</a></li>
+                    </ul>
+                </div>
+                <div class="footer__column">
+                    <h4 class="footer__column-title">지원</h4>
+                    <ul class="footer__menu">
+                        <li><a href="#">도움말 센터</a></li>
+                        <li><a href="#">가이드</a></li>
+                        <li><a href="#">API 문서</a></li>
+                        <li><a href="#contact">문의하기</a></li>
+                    </ul>
+                </div>
+                <div class="footer__column">
+                    <h4 class="footer__column-title">회사</h4>
+                    <ul class="footer__menu">
+                        <li><a href="#">소개</a></li>
+                        <li><a href="#">블로그</a></li>
+                        <li><a href="#">채용</a></li>
+                        <li><a href="#">파트너</a></li>
+                    </ul>
+                </div>
+                <div class="footer__column">
+                    <h4 class="footer__column-title">법적 고지</h4>
+                    <ul class="footer__menu">
+                        <li><a href="#">이용약관</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">쿠키 정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <p class="footer__copyright">
+                © 2024 RePoint. All rights reserved.
+            </p>
+            <div class="footer__social">
+                <a href="#" aria-label="Instagram" class="footer__social-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                </a>
+                <a href="#" aria-label="YouTube" class="footer__social-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+                        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+                    </svg>
+                </a>
+                <a href="#" aria-label="Blog" class="footer__social-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PWA Install Prompt -->
+    <div class="pwa-prompt" id="pwa-prompt">
+        <div class="pwa-prompt__content">
+            <div class="pwa-prompt__icon">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M12 20 Q20 8 28 20 Q20 32 12 20" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+            </div>
+            <div class="pwa-prompt__text">
+                <strong>RePoint 앱 설치</strong>
+                <span>홈 화면에 추가하여 더 빠르게 접근하세요</span>
+            </div>
+            <button class="pwa-prompt__install" id="pwa-install">설치</button>
+            <button class="pwa-prompt__close" id="pwa-close" aria-label="닫기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/js/main.js" defer></script>
+</body>
+</html>

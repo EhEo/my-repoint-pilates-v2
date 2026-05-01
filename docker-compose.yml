@@ -1,29 +1,40 @@
 version: '3.8'
 
 services:
-  frontend:
+  landing:
+    image: node:20-alpine
+    working_dir: /app
+    command: npx --yes serve@14.2.0 -l 3001 .
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/landing:/app
+
+  admin:
     build:
-      context: .
+      context: ./apps/admin
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
     volumes:
-      - .:/app
+      - ./apps/admin:/app
       - /app/node_modules
     environment:
       - VITE_API_URL=http://localhost:3000
     depends_on:
-      - server
+      - api
 
-  server:
+  api:
     build:
-      context: ./server
+      context: ./apps/api
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./server:/app
+      - ./apps/api:/app
       - /app/node_modules
+    env_file:
+      - ./apps/api/.env
     environment:
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/pilates?schema=public

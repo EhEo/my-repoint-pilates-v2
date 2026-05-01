@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4A5D52">
+    <title>오프라인 - RePoint Pilates</title>
+    <style>
+        :root {
+            --color-primary: #4A5D52;
+            --color-secondary: #F7F4ED;
+            --color-gold: #B8956F;
+            --color-text: #2D3436;
+            --color-cream: #FAF8F5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--color-cream);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .offline {
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .offline__icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            color: var(--color-primary);
+            opacity: 0.5;
+        }
+
+        .offline__title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        .offline__description {
+            font-size: 1rem;
+            color: var(--color-text);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.7;
+        }
+
+        .offline__button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--color-primary);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .offline__button:hover {
+            background: #3A4A42;
+            transform: translateY(-2px);
+        }
+
+        .offline__button svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="offline">
+        <svg class="offline__icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2" stroke-dasharray="10 5"/>
+            <path d="M30 50 Q50 20 70 50 Q50 80 30 50" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+            <line x1="25" y1="25" x2="75" y2="75" stroke="currentColor" stroke-width="3"/>
+        </svg>
+
+        <h1 class="offline__title">오프라인 상태입니다</h1>
+
+        <p class="offline__description">
+            인터넷 연결이 끊어졌습니다.<br>
+            네트워크 연결을 확인하고 다시 시도해주세요.
+        </p>
+
+        <button class="offline__button" onclick="location.reload()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 4v6h6"/>
+                <path d="M23 20v-6h-6"/>
+                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+            </svg>
+            <span>다시 시도</span>
+        </button>
+    </div>
+
+    <script>
+        // Check when back online
+        window.addEventListener('online', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

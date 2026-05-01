@@ -1,0 +1,260 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  PAUSED
+}
+
+// Class delivery format (formerly named MembershipType — renamed in Phase 3
+// to disambiguate from Membership records).
+enum ClassType {
+  GROUPS
+  PRIVATE
+  DUET
+}
+
+enum ClassLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL
+}
+
+enum ReservationStatus {
+  CONFIRMED
+  CANCELLED
+  WAITLIST
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  MEMBER
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+// Phase 5C — Notification system. Stubbed channel adapters; types kept narrow
+// to what is actually triggered today (reservation events, membership expiry scan).
+enum NotificationType {
+  RESERVATION_CONFIRMED
+  RESERVATION_CANCELLED
+  MEMBERSHIP_EXPIRY
+}
+
+enum NotificationChannel {
+  APP
+  SMS
+  KAKAO
+  EMAIL
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum RecipientType {
+  MEMBER
+  INSTRUCTOR
+  ADMIN
+}
+
+// Models
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id        String       @id @default(uuid())
+  name      String
+  email     String       @unique
+  phone     String
+  avatar    String?
+  status    MemberStatus @default(ACTIVE)
+  joinDate  DateTime     @default(now())
+  lastVisit DateTime?
+  notes     String?
+
+  memberships  Membership[]
+  reservations Reservation[]
+  assessments  Assessment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Phase 5A (minimal) — 신체 평가 (PRD 3.1.4 의 일부 항목만).
+// 자세/유연성/근력/처방/사진/리포트는 미도입. 핵심 추적 지표(키/체중/BMI/
+// 체지방률/근육량) + 자유 텍스트 메모만. BMI 는 height + weight 모두 있을
+// 때 라우트 레이어에서 자동 계산해 저장.
+model Assessment {
+  id          String   @id @default(uuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  date        DateTime @default(now())
+  heightCm    Float? // cm
+  weightKg    Float? // kg
+  bmi         Float? // kg/m^2 (자동 계산)
+  bodyFatPct  Float? // %
+  muscleMassKg Float? // kg
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId, date])
+}
+
+// Count-based membership (횟수권). Single active membership per member is
+// enforced in application logic — schema does not unique-constrain this so
+// historical (EXPIRED/CANCELLED) records can coexist with a current ACTIVE one.
+model Membership {
+  id             String           @id @default(uuid())
+  memberId       String
+  member         Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  totalCount     Int
+  remainingCount Int
+  startDate      DateTime         @default(now())
+  endDate        DateTime
+  status         MembershipStatus @default(ACTIVE)
+
+  // Phase 4 (mini) — payment is tracked as flags only for now. A proper
+  // Payment table is deferred. Admin toggles these manually when cash/card
+  // is collected or a refund is processed.
+  paid        Boolean   @default(false)
+  paidAt      DateTime?
+  refundedAt  DateTime?
+  paymentNote String? // free-text memo: 결제 수단, 환불 사유 등
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([memberId, status])
+}
+
+model Instructor {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  specialties String[]
+  avatar      String?
+  status      String   @default("active") // active, inactive, leave
+
+  classes   ClassSession[]
+  schedules InstructorSchedule[]
+  leaves    InstructorLeave[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Recurring weekly availability — one record per (instructor × dayOfWeek × time slot).
+// dayOfWeek: 0=Sunday .. 6=Saturday. Times are local "HH:mm" strings, same convention as ClassSession.
+model InstructorSchedule {
+  id           String     @id @default(uuid())
+  instructorId String
+  instructor   Instructor @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  dayOfWeek    Int // 0..6
+  startTime    String // "HH:mm"
+  endTime      String // "HH:mm"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([instructorId, dayOfWeek])
+}
+
+model Notification {
+  id            String              @id @default(uuid())
+  type          NotificationType
+  channel       NotificationChannel @default(APP)
+  status        NotificationStatus  @default(PENDING)
+  recipientType RecipientType
+  recipientId   String // Member.id, Instructor.id, or User.id depending on recipientType
+  title         String
+  body          String
+  payload       Json? // optional structured data for clients (memberId, classSessionId, daysBefore, etc.)
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  errorMessage  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([recipientType, recipientId])
+  @@index([status, scheduledFor])
+}
+
+// One-off unavailability override (휴무). Inclusive date range; for a single day,
+// startDate == endDate.
+model InstructorLeave {
+  id           String     @id @default(uuid())
+  instructorId String
+  instructor   Instructor @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  startDate    DateTime
+  endDate      DateTime
+  reason       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([instructorId, startDate])
+}
+
+model ClassSession {
+  id        String     @id @default(uuid())
+  title     String
+  date      DateTime // YYYY-MM-DD handled as DateTime
+  startTime String // HH:mm
+  endTime   String // HH:mm
+  capacity  Int
+  enrolled  Int        @default(0)
+  type      ClassType
+  level     ClassLevel
+  room      String
+
+  instructorId String
+  instructor   Instructor @relation(fields: [instructorId], references: [id])
+
+  reservations Reservation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  status    ReservationStatus @default(CONFIRMED)
+  timestamp DateTime          @default(now())
+
+  memberId String
+  member   Member @relation(fields: [memberId], references: [id])
+
+  classSessionId String
+  classSession   ClassSession @relation(fields: [classSessionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
